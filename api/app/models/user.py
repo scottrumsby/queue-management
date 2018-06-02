@@ -1,8 +1,7 @@
-from flask_login import UserMixin
 from flask_restplus import fields
 from qsystem import api, db
 
-class User(UserMixin, db.Model):
+class User(db.Model):
     __tablename__ = 'users'
 
     model = api.model('User', {

@@ -67,20 +67,26 @@ export const store = new Vuex.Store({
   },
 
   mutations: {
-    logIn: state => state.isLoggedIn = true,
+    logIn(state) {
+      console.log("login")
+      state.isLoggedIn = true
+    },
 
-    logOut: state => state.isLoggedIn = false,
+    logOut(state) {
+      console.log("logout")
+      state.isLoggedIn = false
+    },
 
     updateList(state, payload) {
       state.items = []
       state.items = payload
-      },
+    },
 
     setUser(state, payload) {
       let keys = Object.keys(payload)
       keys.forEach( key => {
         state.user[key] = payload[key]
       })
-    }
-}
-  })
+    } 
+  }
+})

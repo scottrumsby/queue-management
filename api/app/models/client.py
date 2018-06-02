@@ -7,12 +7,14 @@ class Client(db.Model):
     model = api.model('Office', {
         'id': fields.String,
         'name': fields.String,
-        'office_id': fields.String
+        'office_id': fields.String,
+        'service': fields.String
     })
 
     id        = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name      = db.Column(db.String(80), nullable=False)
     office_id = db.Column(db.Integer, db.ForeignKey('offices.id'))
+    service   = db.Column(db.String(80), nullable=True)
 
     def __repr__(self):
         return '<Client %r>' % self.name

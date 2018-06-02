@@ -12,21 +12,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.*/
 
-
-
 <template>
-  <div v-if="!this.$store.state.isLoggedIn"
-       id="login-form">
-    <b-form-input v-model="username"
-                  id="login-username"
-                  type="text"
-                  placeholder="Username"/>
-    <b-form-input v-model="password"
-                  id="login-password"
-                  type="password"
-                  placeholder="Password"/>
-    <b-button @click="login()"
-              id="login-button">Login</b-button>
+  <div v-if="!this.$store.state.isLoggedIn" id="login-form">
+    <b-button @click="login()" id="login-button">Login</b-button>
   </div>
   <div v-else>
     <h6>Logged in as: {{  this.$store.state.user.name }}</h6>
@@ -36,50 +24,26 @@ limitations under the License.*/
 </template>
 
 <script type="text/javascript">
-export default {
-  name: 'Login',
-  data() {
-    return {
-      username: '',
-      password: ''
-    }
-  },
-  methods: {
-    login() {
-      let url = "/login/"
-      let data = {
-        username: this.username,
-        password: this.password
-      }
 
-      this.$axios.post(url, data)
-        .then( () => {
-          this.verifyLogin()
-        })
-        .catch( () => {
-          this.verifyLogin()
-        })
+  export default {
+    name: 'Login',
+    data() {
+      return {
+        username: '',
+        password: ''
+      }
     },
-    logout() {
-      let url = "/logout/"
-      this.$axios.get(url)
-      .then( () => {
-        this.$root.$emit('socketDisconnect')
-        this.$store.commit('logOut')
-      })
-    },
-    verifyLogin() {
-      let url  = "/users/me/"
-      this.$axios.get(url)
-        .then( response => {
-          this.$root.$emit('socketConnect')
-          this.$store.commit('logIn')
-          this.$store.commit('setUser', {
-            name: response.data.username,
-            office_id: response.data.office_id
-          })
-        })
+    methods: { 
+      login() {
+        console.log(1)
+        this.$store.logIn;
+        console.log(3)
+      },
+      logout() {
+        console.log(2)
+        this.$store.logOut;
+        console.log(4)
+      }
     }
   }
-}
 </script>

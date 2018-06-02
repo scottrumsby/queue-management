@@ -12,8 +12,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.*/
 
-
-
 <template>
   <b-container>
     <b-row align-v="end">
@@ -37,12 +35,40 @@ limitations under the License.*/
   import Socket from './Socket'
   import Controls from './Controls'
 
+  var authorized = localStorage.getItem("AUTHORIZED");
+  if (!authorized){
+    var keycloak = Keycloak("static/keycloak.json");
+    var token;
+    keycloak.init({token: token, onLoad: 'login-required'}).success(function (authenticated) {
+    if (authenticated) {
+        localStorage.setItem('KEYCLOAK_TOKEN', keycloak.token);
+        localStorage.setItem("AUTHORIZED",true);
+        // Get user profile
+        keycloak.loadUserProfile().success(function (userProfile) {
+          window.location.assign("/");
+        });
+      } else {
+        alert('not authenticated');
+      }
+    }).error(function () {
+      alert('failed to initialize');
+    });
+  }
+
   export default {
     name: 'App',
     components: {
       Login,
       Socket,
       Controls
+    },
+    mounted() {
+      if(authorized){
+        console.log("Authed")
+        this.$store.logIn;
+      } else {
+        console.log("Not authed");
+      }
     }
   }
 
