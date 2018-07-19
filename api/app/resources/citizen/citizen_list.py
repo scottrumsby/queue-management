@@ -63,7 +63,7 @@ class CitizenList(Resource):
         db.session.add(citizen)
         db.session.commit()
 
-        socketio.emit('update_customer_list', {})
+        socketio.emit('update_customer_list', {}, room=csr.office_id)
         result = self.citizen_schema.dump(citizen)
 
         return {'citizen': result.data,
