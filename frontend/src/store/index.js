@@ -32,8 +32,13 @@ export const store = new Vuex.Store({
       descending:false,
       perpage:''
     },
-    items: [],
-    user: null,
+    citizens: [],
+    user: {
+      username: null,
+      office: {
+        office_name: null
+      }
+    },
     addCitizenModal: {
       visible: false,
       showAlert: true,
@@ -45,7 +50,8 @@ export const store = new Vuex.Store({
         search: '',
         category: '',
         service:'',
-        quick: false
+        quick: false,
+        index: ''
       },
     },
     userOfficeType:1,
@@ -111,18 +117,36 @@ export const store = new Vuex.Store({
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
   actions: {
+    setBearer(context, payload) {
+      context.commit('setBearer', payload)
+      context.dispatch('logIn')
+    },
+    logIn(context) {
+      context.commit('logIn')
+      
+      Axios(context).get('/csrs/me/')
+        .then( resp => {
+          context.commit('setUser', resp.data.csr)
+        })
+    },
     putCitizenInQueue(context, payload=1) {
       let { formData } = context.state.addCitizenModal
       let { citizen_id } = formData.citizen
       
+      let qt_xn_citizen_ind = 0
+      if (formData.quick) {
+        qt_xn_citizen_ind = 1
+      }
+      
       let citizen = {
-        citizen_comments: formData.comments
+        citizen_comments: formData.comments,
+        qt_xn_citizen_ind
       }
       let service_request = {
         service_id: formData.service,
         citizen_id,
         quantity: payload,
-        channel_id: formData.channel
+        channel_id: formData.channel,
       }
     
       Axios(context).put(`/citizens/${citizen_id}/`,citizen)
@@ -169,7 +193,6 @@ export const store = new Vuex.Store({
           console.log(error.response)
           console.log(error.message)
         })
-      context.commit('toggleAddCitizen', true)
       context.dispatch('getCategories')
       context.dispatch('getChannels')
       context.dispatch('getServices')
@@ -214,9 +237,8 @@ export const store = new Vuex.Store({
       let url = "/citizens/"
       Axios(context).get(url)
         .then( response => {
-          console.log(response.data)
-          let { clients } = response.data
-        context.commit('updateList', clients)
+          console.log(response.data.citizens)
+        context.commit('updateList', response.data.citizens)
         })
         .catch(error => {
           console.log('error @ store.actions.getAllClients')
@@ -262,6 +284,22 @@ export const store = new Vuex.Store({
     },
     handleServiceClick(context, payload) {
       console.log(context)
+    },
+    closeModalEarly(context) {
+      let { citizen_id } = context.state.addCitizenModal.formData.citizen
+      Axios(context).post(`/citizens/${citizen_id}/citizen_left/`,{})
+      context.commit('toggleAddCitizen', false)
+      context.commit('resetFormData')
+    },
+    testApi(context) {
+      console.log('it got to the store')
+      Axios(context).get('/csrs/me/')
+        .then(resp=>{
+          console.log(resp.data)
+        })
+        .catch( () => {
+          console.log('nope@!!!')
+        })
     }
   },
 /////////////////////////////////////////////////
@@ -317,8 +355,8 @@ export const store = new Vuex.Store({
       state.addCitizenModal.visible = payload
     },
     updateList(state, payload) {
-      state.items = []
-      state.items = payload
+      state.citizens = []
+      state.citizens = payload
     },
     updateDash(state, payload) {
       Vue.set(

@@ -15,27 +15,90 @@ limitations under the License.*/
 
 
 <template>
-  <DashTable :table_status="dash_status" />
+  <b-container fluid>
+    <b-row class="dashrow">
+      <ClientService />
+      <AddCitizen />
+      <Login />
+    </b-row>
+    <b-row no-gutters>
+      <b-col>
+        Citizens Waiting: {{ queueLength }}
+      </b-col>
+    </b-row>
+    <b-row>
+      <DashTable />
+    </b-row>
+    <b-row>
+      <b-col>
+        <Socket v-show="f" />
+      </b-col>
+      <b-col/>
+      <b-col/>
+    </b-row>
+    <b-row :no-gutters="t">
+      <b-col>
+        Citizens on Hold: 0
+      </b-col>
+    </b-row>
+    <b-row>
+      <b-col>
+        <DashHoldTable v-if="f"/>
+      </b-col>
+    </b-row>
+  </b-container>
 </template>
 
 <script>
 import { mapState, mapGetters } from 'vuex'
+import ClientService from './client-service'
+import Login from './Login'
+import AddCitizen from './add-citizen/add-citizen'
+import Socket from './Socket'
 import DashTable from './dash-table'
+import DashHoldTable from './dash-hold-table'
 
   export default {
     name: 'Dash',
-    components: { DashTable },
-    created() {
+    components: { 
+      AddCitizen, 
+      ClientService, 
+      Login,
+      Socket,
+      DashTable,
+      DashHoldTable
+    },
+    mounted() {
       this.$store.dispatch('getAllClients')
     },
+    data() {
+      return {
+        t: true,
+        f: false
+      }
+    },
     computed: {
-      ...mapState(['clients',]),
+      sortBy: {
+        get() { return this.dash_status.sort },
+        set(value) { this.$store.commit('updateDash'),{type:'sortby',value}}
+      },
+      ...mapState({
+        citizens(state) {
+          let filtered = state.citizens.filter(ctzn=>
+            ctzn.service_reqs.length > 0
+          )
+        return filtered
+        }
+      }),
       ...mapGetters(['dash_status']),
-      totalRows() {
-        return this.clients.length
+      queueLength() {
+        return this.citizens.length
       },
       sortDesc() {
         return this.dash_status.descending
+      },
+      totalRows() {
+        return citizens.length()
       },
       sortBy: {
         get() { return this.dash_status.sort },
@@ -48,7 +111,15 @@ import DashTable from './dash-table'
       perPage: {
         get() { return this.dash_status.perpage },
         set(value) { this.$store.commit('updateDash',{type:'perpage',value}) }
+      },
+      clients() {
+        return 
       }
     }
   }
 </script>
+
+<style>
+  .dashrow {
+    background-color: pink;
+  }

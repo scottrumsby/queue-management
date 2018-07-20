@@ -15,15 +15,11 @@ limitations under the License.*/
 
 
 <template>
-  <div id='client-table'>
+  <div id='client-hold-table'>
     <b-table small
              :items="citizens"
              :fields="fields"
-             outlined
-             hover
-             striped
-             class="p-0 m-0"
-             thead-tr-class="dashtabletrthead"
+             bordered
              >
       <template slot='qt_xn_citizen_ind' slot-scope='data'>
         {{ (data.item.qt_xn_citizen_ind===0) ?
@@ -42,45 +38,35 @@ limitations under the License.*/
   import { mapState, mapGetters } from 'vuex'
 
   export default {
-    name: 'DashTable',
+    name: 'DashHoldTable',
     data() {
       return {
         t:true,
         f:false,
         fields: [
           {key: 'qt_xn_citizen_ind', label: 'Q. Txn', sortable: false},
-          {key: 'start_time', label: 'Time', sortable: true},
+          {key: 'start_time', label: 'Time', sortable: false},
           {key: 'ticket_number', label: 'Ticket', sortable: false},
-          {key: 'service_reqs[0].periods[0].csr.username', label: 'Served By', sortable: false},
+          {key: 'office_citizens', label: 'Served By', sortable: false},
           {key: 'service_reqs[0].service.parent.service_name', label: 'Category', sortable: false},
           {key: 'service_reqs[0].service.service_name', label: 'Service', sortable: false},
-          {key: 'service_reqs[0].periods[0].ps.ps_name', label: 'State', sortable: false},
+          {key: 'cs.cs_state_name', label: 'State', sortable: false},
           {key: 'citizen_comments', label: 'Comments', sortable: false}
         ]
       }
     },
     computed: {
-      ...mapState({
-        citizens(state) {
-          let filtered = state.citizens.filter(ctzn=>
-            ctzn.service_reqs.length > 0
-          )
-        return filtered
-        }
-      })
+      ...mapState(['citizens'])
     },
     methods: {
       formatTime(data) {
         let date = new Date(data)
         let display = date.toLocaleTimeString()
         return display
+      },
+      formatQuick(data) {
+        
       }
     }
   }
 </script>
-
-<style scoped>
-  .dashtabletrthead {
-    color: red;
-  }
-</style>

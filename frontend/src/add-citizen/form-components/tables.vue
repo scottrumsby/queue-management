@@ -1,56 +1,49 @@
 <template>
+  <b-form-row>
+    <b-col class="px-0 pb-0 pt-0 m-0">
   <div style="
          border: 1px solid silver;
          border-radius: 6px;
+         margin: 0 px;
          padding: 6px;
        ">
-    <b-table :fields="fields"
-             id="table1"
-             :small="t"
-             :bordered="f"
-             :fixed="t"
-             >
-             <template slot="HEAD_service_name" slot-scope="data">
-               {{data.label}} 
-             </template>
-             <template slot="HEAD_parent.service_name" slot-scope="data">
-               {{data.label}}
-             </template>
-    </b-table>
-    <div style="
-           height:200px; 
-           overflow-y: scroll;
-           margin-top: 0px;
-         ">
-  <b-table :items="services" 
-           :fields="fields"
-           :filter="filter"
-           :small="t"
-           :bordered="f"
-           :striped="f"
-           :fixed="t"
-           id="table2"
-           thead-class="header-table"
-           @row-clicked="rowClicked"
-           > 
-             <template slot="HEAD_service_name" slot-scope="data">
-               <div style="display: none">lala</div>
-             </template>
-             <template slot="HEAD_parent.service_name" slot-scope="data">
-               <div style="display: none">lala</div>
-             </template>
-             <template slot="service_name" slot-scope="data">
-               {{data.item.service_name}}
-               <div style="display: none">
-                 {{(data.item.service_id==selectedRow)?
-                   (data.item._rowVariant='active'):
-                    (data.item._rowVariant='')}}
-               </div>
-             </template>
-  </b-table>
-</div>
-  
-</div>
+    <b-form-row>
+      <b-col class="pl-3">Service</b-col>
+      <b-col class="pl-0">Category</b-col>
+    </b-form-row>
+    <b-form-row>
+      <b-col>
+        <div id="innertable"
+             style="height: 200px; 
+                    overflow-y: scroll;
+                    margin: 4px;"
+                    >
+          <b-table :items="services" 
+                   :fields="fields"
+                   :filter="filter"
+                   :small="t"
+                   :bordered="f"
+                   :striped="f"
+                   :fixed="t"
+                   id="table2"
+                   :thstyle="thstyle"
+                   @row-clicked="rowClicked"
+                   > 
+            <template slot="service_name" slot-scope="data">
+              {{data.item.service_name}}
+              <div style="display: none">
+               {{ (data.item.service_id==selectedRow) ?
+                    (data.item._rowVariant='active') :
+                      (data.item._rowVariant='') }}
+              </div>
+            </template>
+          </b-table>
+        </div>
+      </b-col>
+    </b-form-row>
+  </div>
+  </b-col>
+</b-form-row>
 </template>
 
 <script>
@@ -60,19 +53,24 @@
     name: 'Tables',
     data() {
       return {
-        selectedRow:'',
+        thstyle: {
+          display: 'none',
+          hidden: true
+        },
         f:false,
         t:true,
         fields: [
           {
             key: 'service_name',
             label: 'Service',
-            sortable: false
+            sortable: false,
+            thStyle:{display: 'none'}
           },
           {
             key: 'parent.service_name',
             label: 'Category',
-            sortable: false
+            sortable: false,
+            thStyle:{display: 'none'}
           }
         ]
       }
@@ -80,6 +78,9 @@
     computed: {
       ...mapState(['addCitizenModal']),
       ...mapGetters(['index','form_data']),
+      selectedRow() {
+        return this.addCitizenModal.formData.service
+      },
       filter() {
         return this.form_data.search
       },
@@ -110,8 +111,6 @@
   }
 </script
 
-<style scoped>
-.header-table{
-  display: none;
-}
+<style>
+
 </style>
