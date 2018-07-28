@@ -89,8 +89,6 @@ limitations under the License.*/
         <DashHoldTable />
       </b-col>
     </b-row>
-    
-  
   </b-container>
 </div>
 </template>
