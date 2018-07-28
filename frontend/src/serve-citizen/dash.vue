@@ -80,13 +80,13 @@ limitations under the License.*/
     
     <b-row no-gutters v-if="isLoggedIn">
       <b-col> 
-        Citizens on Hold: 0
+        Citizens on Hold: {{on_hold.length   }}
       </b-col>
     </b-row>
     
     <b-row v-if="isLoggedIn">
       <b-col>
-        <DashHoldTable v-if="f"/>
+        <DashHoldTable />
       </b-col>
     </b-row>
     
@@ -141,7 +141,7 @@ import ServeCitizen from './serve-citizen'
         'backOfficeDisabled',
         'dismissCountDown'
       ]),
-      ...mapGetters(['filtered_citizens']),
+      ...mapGetters(['filtered_citizens', 'on_hold']),
       
       queueLength() {
         return this.filtered_citizens.length
@@ -149,19 +149,18 @@ import ServeCitizen from './serve-citizen'
     }, 
     
     methods: {
+      ...mapMutations(['setAlert']),
       ...mapActions([
         'clickInvite', 
         'addCitizen', 
         'clickServiceModalClose',
         'clickCitizenLeft',
         'clickServeNow'
-      ]),
-      ...mapMutations(['showAlert']),
-      
+      ]),      
       
       invite() {
         if (this.queueLength === 0) {
-          this.showAlert()
+          this.setAlert('The are currently no citizens to invite.')
         } else {
           this.clickInvite()
         }
