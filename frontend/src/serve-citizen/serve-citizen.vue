@@ -1,30 +1,30 @@
 
 
 <template>
-    <b-modal id="serve_citizen_modal" 
+    <b-modal id="serve_citizen_modal"
              :visible="this.$store.state.showServiceModal"
              size="lg"
-             hide-header	
+             hide-header
              hide-footer
              no-close-on-backdrop
              no-close-on-esc
-             class="serve_modal"
+             class="m-0 p-0"
              >
-             
-     <div style="display: flex; flex-direction: row; justify-content: space-between" class="modal-header">
+
+     <div style="display: flex; flex-direction: row; justify-content: space-between" class="modal_header">
        <div><h5>Serve Citizen</h5></div>
        <div><b-button-close size="lg" @click="closeWindow" /></div>
      </div>
-      
-      <b-container id="serve-outer-container" 
+
+      <b-container id="serve-outer-container"
                    fluid
-                   >  
+                   >
         <b-row no-gutters class="p-2">
           <b-col cols="6">
             <div>Ticket #: <strong>{{citizen.ticket_number}}</strong></div>
             <div>Channels: <strong>{{channel.channel_name}}</strong></div>
             <div class="pt-3">
-              
+
               <b-button  @click="clickServiceBeginService" :disabled="serveBeginServiceDisabled">
                 Begin Service
               </b-button>
@@ -34,8 +34,8 @@
               <b-button  @click="clickReturnToQueue" :disabled="serveReturnQueueDisabled">
                 Return to Queue
               </b-button>
-              
-              
+
+
             </div>
           </b-col>
           <b-col cols="6" style="text-align: left" class="pr-2">
@@ -52,10 +52,10 @@
           </b-col>
         </b-row>
       </b-container>
-      
+
       <ServeCitizenTable/>
-      
-      <b-container fluid 
+
+      <b-container fluid
                    id="serve-light-inner-container"
                    class="pt-3 mt-3 mb-4"
                    >
@@ -73,9 +73,9 @@
           <b-col cols="2"/>
         </b-row>
       </b-container>
-      
-      <b-container fluid 
-                   id="add-citizen-modal-footer" 
+
+      <b-container fluid
+                   id="add-citizen-modal-footer"
                    class="pt-3 mt-5">
         <b-row no-gutters>
           <b-col cols="2" />
@@ -124,11 +124,11 @@ export default {
       'serveReturnQueueDisabled',
       'finishDisabled'
     ]),
-    
+
     citizen() {
     return this.invitedCitizen
   },
-    
+
     comments: {
       get() { return this.citizen.citizen_comments },
       set(value) {
@@ -136,7 +136,7 @@ export default {
       }},
       options() {
         let { service_reqs } = this.citizen
-        
+
         if (service_reqs.length === 1 || !service_reqs) {
           return [{text:'no other services', value: null}]
         } else if (service_reqs.length > 1) {
@@ -146,7 +146,7 @@ export default {
         return array_options
         }
       },
-    
+
     channel() {
       if (this.citizen) {
         return this.citizen.service_reqs[0].channel
@@ -154,7 +154,7 @@ export default {
         return ''
       }
     }},
-  
+
   methods: {
     ...mapActions([
       'clickCitizenLeft',
@@ -173,7 +173,7 @@ export default {
         toggleAdd: 'toggleAddCitizen'
       }
     ),
-    
+
     closeWindow() {
       this.$store.dispatch('clickServiceModalClose')
     },
@@ -189,7 +189,7 @@ export default {
 
 </script>
 <style>
-  
+
 #serve_citizen_modal > div > div {
   width: 1200px !important;
   left: -200px;
