@@ -19,8 +19,8 @@ limitations under the License.*/
     <div v-show="!this.$store.state.isLoggedIn">
       <b-button @click="login()"
                 id="login-button"
-                style="padding-top: 10px">Login
-      </b-button>
+                style="padding-top: 10px"
+                class="btn btn-link">Login</b-button>
     </div>
 
     <div v-show="this.$store.state.isLoggedIn"
@@ -31,14 +31,13 @@ limitations under the License.*/
       </div>
       <div style="padding-right: 20px">
         <label class="navbar-label">User: {{ this.$store.state.user.username }}</label>
-        <br />
-        <label class="navbar-label"">Office: {{ this.$store.state.user.office.office_name }}</label>
+        <label class="navbar-label">Office: {{ this.$store.state.user.office.office_name }}</label>
       </div>
       <div style="padding-top: 5px">
         <b-button v-show="this.$store.state.isLoggedIn"
                   @click="logout()"
-                  id="logout-button">Logout
-        </b-button>
+                  id="logout-button"
+                  class="btn btn-secondary">Logout</b-button>
       </div>
     </div>
   </b-col>
@@ -184,6 +183,8 @@ import { mapGetters } from 'vuex'
 .navbar-label {
   color: white;
   margin-bottom: 0px;
+  float: left;
+  clear: both;
 }
 
 .navbar-brand {

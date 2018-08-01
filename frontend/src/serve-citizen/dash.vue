@@ -30,24 +30,17 @@ limitations under the License.*/
         <b-col style="padding-top: 10px">
           <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: flex-start">
             <div>
-              <b-button class="m-1"
+              <b-button class="m-1 btn-primary"
                         @click="invite"
-                        :disabled="inviteButtonDisabled"
-                        >
-                Invite
-              </b-button>
-              <b-button class="m-1"
+                        :disabled="inviteButtonDisabled">Invite</b-button>
+              <b-button class="m-1 btn-primary"
                         @click="clickServeNow"
-                        :disabled="serveButtonDisabled"
-                        >
-                Serve Now
-              </b-button>
+                        :disabled="serveButtonDisabled">Serve Now</b-button>
             </div>
             <div>
-              <b-button class="m-1"
+              <b-button class="m-1 btn-primary"
                         @click="addCitizen"
-                        :disabled="addCitizenDisabled"
-                        >Add Citizen</b-button>
+                        :disabled="addCitizenDisabled">Add Citizen</b-button>
               <b-button class="m-1" v-if="f" :disabled="backOfficeDisabled">Back Office</b-button>
             </div>
           </div>
