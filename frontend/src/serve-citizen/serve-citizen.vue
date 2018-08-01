@@ -8,8 +8,7 @@
              hide-footer
              no-close-on-backdrop
              no-close-on-esc
-             class="m-0 p-0"
-             >
+             class="m-0 p-0">
 
      <div style="display: flex; flex-direction: row; justify-content: space-between" class="modal_header">
        <div><h5>Serve Citizen</h5></div>
@@ -17,25 +16,20 @@
      </div>
 
       <b-container id="serve-outer-container"
-                   fluid
-                   >
+                   fluid>
         <b-row no-gutters class="p-2">
           <b-col cols="6">
             <div>Ticket #: <strong>{{citizen.ticket_number}}</strong></div>
             <div>Channels: <strong>{{channel.channel_name}}</strong></div>
             <div class="pt-3">
-
-              <b-button  @click="clickServiceBeginService" :disabled="serveBeginServiceDisabled">
-                Begin Service
-              </b-button>
-              <b-button  @click="clickCitizenLeft">
-                Citizen Left
-              </b-button>
-              <b-button  @click="clickReturnToQueue" :disabled="serveReturnQueueDisabled">
-                Return to Queue
-              </b-button>
-
-
+              <b-button @click="clickServiceBeginService"
+                        :disabled="serveBeginServiceDisabled"
+                        class="btn-primary">Begin Service</b-button>
+              <b-button @click="clickReturnToQueue"
+                        :disabled="serveReturnQueueDisabled"
+                        class="btn-primary">Return to Queue</b-button>
+              <b-button @click="clickCitizenLeft"
+                        class="btn-danger">Citizen Left</b-button>
             </div>
           </b-col>
           <b-col cols="6" style="text-align: left" class="pr-2">
@@ -46,25 +40,20 @@
               <b-textarea id="serve_comment_textarea"
                           v-model="comments"
                           :rows="4"
-                          size="sm"
-                          />
+                          size="sm"/>
             </div>
           </b-col>
         </b-row>
       </b-container>
-
       <ServeCitizenTable/>
-
       <b-container fluid
                    id="serve-light-inner-container"
-                   class="pt-3 mt-3 mb-4"
-                   >
+                   class="pt-3 mt-3 mb-4">
         <b-row no-gutters>
           <b-col cols="2"/>
           <b-col cols="3"><b-form-select v-model="selected"
                                          :options="options"
-                                         v-if="f"
-                                         />
+                                         v-if="f" />
           </b-col>
           <b-col cols="2"/>
           <b-col cols="3" style="align: right">
@@ -80,15 +69,15 @@
         <b-row no-gutters>
           <b-col cols="2" />
           <b-col cols="3">
-            <b-button @click="clickHold" :disabled="finishDisabled" class="w-75">
-              Place on Hold
-            </b-button>
+            <b-button @click="clickHold"
+                      :disabled="finishDisabled"
+                      class="w-75 btn-primary">Place on Hold</b-button>
           </b-col>
           <b-col cols="2" />
           <b-col cols="3">
-            <b-button @click="clickFinishService" :disabled="finishDisabled" class="w-75" >
-              Finish
-            </b-button>
+            <b-button @click="clickFinishService"
+                      :disabled="finishDisabled"
+                      class="w-75 btn-primary" >Finish</b-button>
           </b-col>
           <b-col cols="2" />
         </b-row>
