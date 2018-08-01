@@ -46,18 +46,15 @@
         </b-row>
       </b-container>
       <ServeCitizenTable/>
+      
       <b-container fluid
                    id="serve-light-inner-container"
                    class="pt-3 mt-3 mb-4">
         <b-row no-gutters>
-          <b-col cols="2"/>
-          <b-col cols="3"><b-form-select v-model="selected"
-                                         :options="options"
-                                         v-if="f" />
-          </b-col>
-          <b-col cols="2"/>
-          <b-col cols="3" style="align: right">
-            <b-button v-if="f" class="w-75">Add Next Service</b-button>
+          <b-col cols="7"/>
+        
+          <b-col cols="auto" style="align: right">
+            <b-button class="w-100" @click="clickAddService">Add Next Service</b-button>
           </b-col>
           <b-col cols="2"/>
         </b-row>
@@ -147,13 +144,12 @@ export default {
   methods: {
     ...mapActions([
       'clickCitizenLeft',
-      'postBeginService',
-      'editServiceButton',
       'clickServiceBeginService',
       'clickServiceModalClose',
       'clickFinishService',
       'clickReturnToQueue',
-      'clickHold'
+      'clickHold',
+      'clickAddService'
     ]),
     ...mapMutations(
       {

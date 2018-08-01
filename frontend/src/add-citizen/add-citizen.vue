@@ -69,11 +69,11 @@ export default {
     },
 
     computed: {
-      ...mapState(['addCitizenModal', 'showAddModal']),
-      ...mapGetters(['form_data', 'add_modal_setup']),
-
+      ...mapState(['addCitizenModal', 'showAddModal', 'addModalSetup']),
+      ...mapGetters(['form_data']),
+      
       modalTitle() {
-        if (this.add_modal_setup === 'edit_mode') {
+        if (this.addModalSetup === 'edit_mode') {
           return 'Edit Service'
         } else {
           return 'Add Citizen'

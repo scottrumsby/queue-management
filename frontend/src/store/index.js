@@ -16,11 +16,9 @@ limitations under the License.*/
 
 import Vue from 'vue'
 import 'es6-promise/auto'
-import axios from 'axios'
 import Vuex from 'vuex'
-import { Axios } from './helpers'
+import { Axios, formData, invitedCitizen } from './helpers'
 
-import { formData, invitedCitizen } from './helpers'
 
 Vue.use(Vuex)
 
@@ -33,13 +31,24 @@ export const store = new Vuex.Store({
       username: null,
       office: {
         office_name: null
-      }
+      },
+      receptionist_ind: null
     },
     invitedCitizen: {
+      citizen_comments: null,
       ticket_number: null,
+      citizen_id: null,
+      qt_xn_citizen_ind: null,
+      start_time: null,
       service_reqs: [
         {
           start_time: null,
+          service: {
+            parrent: {}
+          },
+          service_id: null,
+          quantity: 1,
+          sr_id: null,
           channel: {
             channel_name: null,
             channel_id: null
@@ -52,6 +61,7 @@ export const store = new Vuex.Store({
       service_reqs: [
         {
           start_time: null,
+          quantity: 1,
           channel: {
             channel_name: null,
             channel_id: null
@@ -61,6 +71,7 @@ export const store = new Vuex.Store({
     },
     searchScreenNextService: false,
     serviceCommentsEdited: false,
+    addModalSetup: 'reception', 
     addCitizenModal: {
       visible: false,
       formData: {
@@ -78,7 +89,7 @@ export const store = new Vuex.Store({
     showServiceModal: false,
     citizens: [],
     hold: [],
-    services: null,
+    services: [],
     categories: [],
     channels: [],
     serveNowDisabled: true,
@@ -93,22 +104,21 @@ export const store = new Vuex.Store({
     serveReturnQueueDisabled: false,
     finishDisabled: true,
     editModal: false,
-    req: 0
+    req: 0,
+    currentQuantity: 1
     
   },
 
   getters: {
-    add_modal_setup(state) {
-      if (state.editModal) {
-        return 'edit_mode'
-      } else {
-        if (state.user.receptionist_ind === 0 ) {
-          return 'non_reception'
-        } else {
-          return 'reception'
-        }
+    service_reqs(state) {
+      if (
+        !state.invitedCitizen ||
+        !state.invitedCitizen.citizen_id ||
+        !state.invitedCitizen.service_reqs
+      ) {
+        return []
       }
-      
+      return state.invitedCitizen.service_reqs
     },
     
     on_hold(state) {
@@ -147,9 +157,11 @@ export const store = new Vuex.Store({
         }
       }
     },
+    
     form_data: state => {
       return state.addCitizenModal.formData
     },
+    
     channel_options: state => {
       return(
         state.channels.map(ch=>
@@ -157,6 +169,7 @@ export const store = new Vuex.Store({
         )
       )
     },
+    
     categories_options: (state, getters) => {
       let opts = state.categories 
       let qry = getters.form_data.search.toUpperCase()
@@ -176,6 +189,7 @@ export const store = new Vuex.Store({
       let finalOpts = blankOpt.concat(mappedOpts)
       return finalOpts
     },
+    
     quick_trans_status(state) {
       if (state.user.qt_xn_csr_ind == 1) {
         return true 
@@ -303,7 +317,7 @@ export const store = new Vuex.Store({
         context.dispatch('getServices')
       }
       context.commit('setDataForEditModal')
-      context.commit('toggleEditModal', true)
+      context.commit('toggleModalSetup', 'edit_mode')
       context.commit('toggleAddCitizen', true)
       context.commit('toggleServiceModal', false)
     },
@@ -311,10 +325,10 @@ export const store = new Vuex.Store({
     clickEditApply(context) {
       context.dispatch('putCitizen')
       context.dispatch('putServiceReq').then( resp => {
-        context.commit('editInvitedCitizen', {type: 'serivce_reqs', value: [resp.data.service_request]})
+        context.commit('editInvitedCitizen', {type: 'service_reqs', value: [resp.data.service_request]})
         context.commit('toggleAddCitizen', false)
         context.commit('toggleServiceModal', true)
-        context.commit('toggleEditModal', false)
+        context.dispatch('toggleModalBack')
         context.commit('resetAddCitizen')
       })
     },
@@ -322,8 +336,39 @@ export const store = new Vuex.Store({
     clickEditCancel(context) {
       context.commit('toggleAddCitizen', false)
       context.commit('toggleServiceModal', true)
-      context.commit('toggleEditModal', false)
+      context.dispatch('toggleModalBack')
       context.commit('resetAddCitizen')
+    },
+    
+    toggleModalBack(context) {
+      if (context.state.user.receptionist_ind === 0) {
+        context.commit('toggleModalSetup', 'non-reception')
+      }
+      if (context.state.user.receptionist_ind === 1) {
+        context.commit('toggleModalSetup', 'reception')
+      }
+    },
+    
+    clickAddService(context) {
+      if (context.state.channels.length === 0) {
+        context.dispatch('getCategories')
+        context.dispatch('getChannels')
+        context.dispatch('getServices')
+      }
+      context.commit('setDataForEditModal')
+      context.commit('toggleModalSetup', 'add_mode')
+      context.commit('toggleAddCitizen', true)
+      context.commit('updateModalForm', {type: 'citizen', value:context.state.invitedCitizen})
+    },
+    
+    clickAddServiceApply(context) {
+      context.dispatch('postServiceReq').then( resp => {
+        context.commit('editInvitedCitizenServices', resp.data.service_request)
+        context.commit('toggleAddCitizen', false)
+        context.commit('toggleServiceModal', true)
+        context.dispatch('toggleModalBack')
+        context.commit('resetAddCitizen')
+      })
     },
     
     clickFinishService(context) {
@@ -386,7 +431,7 @@ export const store = new Vuex.Store({
     clickServiceBeginService(context) {
       let {citizen_id} = context.state.invitedCitizen
       
-      context.dispatch('putCitizenService').then( () => {
+      context.dispatch('putCitizenFromService').then( () => {
         context.dispatch('postBeginService', citizen_id)
         context.commit('disableServiceButtons')
         context.commit('enableFinish')
@@ -401,61 +446,66 @@ export const store = new Vuex.Store({
     putCitizenFromService(context) {
       let { citizen_comments } = context.state.invitedCitizen
       let { citizen_id } = context.state.invitedCitizen
-    
+
       let citizen = {
         citizen_comments,
         citizen_id
       }
-      
-      return new Promise((resolve, reject) => { 
-        let url = `/citizens/${citizen_id}/`
-        Axios(context).put(url,citizen).then(resp=>{ 
-          resolve(resp)
-        }, error => {
-          reject(error)
+      context.dispatch('putServiceQuantity').then( () => {
+        return new Promise((resolve, reject) => {
+          let url = `/citizens/${citizen_id}/`
+          Axios(context).put(url,citizen).then(resp=>{
+            resolve(resp)
+          }, error => {
+            reject(error)
+          })
         })
       })
     },
-    
+
     putCitizen(context) {
       let { formData } = context.state.addCitizenModal
       let { citizen_id } = formData.citizen
-      
-      let qt_xn_citizen_ind 
+
+      let qt_xn_citizen_ind
       formData.quick ? qt_xn_citizen_ind=1 : qt_xn_citizen_ind = 0
-      
+
       let citizen = {
         citizen_comments: formData.comments,
-        qt_xn_citizen_ind 
+        qt_xn_citizen_ind
       }
-      
-      return new Promise((resolve, reject) => { 
+
+      return new Promise((resolve, reject) => {
         let url = `/citizens/${citizen_id}/`
-        Axios(context).put(url,citizen).then(resp=>{ 
+        Axios(context).put(url,citizen).then(resp=>{
           resolve(resp)
         }, error => {
           reject(error)
         })
       })
     },
-    
-    putCitizenService(context) {
-      let {citizen_id} = context.state.invitedCitizen
-      
-      let citizen = {
-        citizen_comments: context.state.invitedCitizen.citizen_comments
+
+    putServiceQuantity(context) {
+      let { req } = context.state
+      let citizen = context.state.invitedCitizen
+      let { citizen_id } = citizen
+      let { sr_id } = citizen.service_reqs[req]
+
+      let service_request = {
+        quantity: citizen.service_reqs[req].quantity
       }
-      
-      return new Promise((resolve, reject) => { 
-        let url = `/citizens/${citizen_id}/`
-        Axios(context).put(url,citizen).then(resp=>{ 
+
+      return new Promise((resolve, reject) => {
+        let url = `/service_requests/${sr_id}/`
+        Axios(context).put(url,service_request).then(resp=>{
           resolve(resp)
         }, error => {
           reject(error)
         })
       })
     },
-    
+
+
     postHold(context, citizen_id) {
       return new Promise((resolve, reject) => {
         let url = `/citizens/${citizen_id}/place_on_hold/`
@@ -466,62 +516,62 @@ export const store = new Vuex.Store({
         })
       })
     },
-    
+
     postServiceReq(context) {
       let { formData } = context.state.addCitizenModal
       let { citizen_id } = formData.citizen
       let service_request = {
         service_id: formData.service,
-        citizen_id,
-        quantity: formData.quantity,
+        citizen_id: citizen_id,
+        quantity: 1,
         channel_id: formData.channel
       }
-      
-      return new Promise((resolve, reject) => { 
+
+      return new Promise((resolve, reject) => {
         let url = `/service_requests/`
-        Axios(context).post(url,{service_request}).then(resp=>{ 
+        Axios(context).post(url, {service_request}).then(resp=>{
           resolve(resp)
         }, error => {
           reject(error)
         })
       })
     },
-    
+
     putServiceReq(context) {
       let { req } = context.state
       let { formData } = context.state.addCitizenModal
       let { citizen_id } = formData.citizen
       let { sr_id } = formData.citizen.service_reqs[req]
-      
+
       let service_request = {
         service_id: formData.service,
         channel_id: formData.channel
       }
-      
-      return new Promise((resolve, reject) => { 
+
+      return new Promise((resolve, reject) => {
         let url = `/service_requests/${sr_id}/`
-        Axios(context).put(url,service_request).then(resp=>{ 
+        Axios(context).put(url,service_request).then(resp=>{
           resolve(resp)
         }, error => {
           reject(error)
         })
       })
     },
-    
+
     postInvite(context, payload) {
       if (payload==='next') {
-        return new Promise((resolve, reject) => { 
+        return new Promise((resolve, reject) => {
           let url = `/citizens/invite/`
-          Axios(context).post(url).then(resp=>{ 
+          Axios(context).post(url).then(resp=>{
             resolve(resp)
           }, error => {
             reject(error)
           })
         })
       } else {
-        return new Promise((resolve, reject) => { 
+        return new Promise((resolve, reject) => {
           let url = `/citizens/${payload}/invite/`
-          Axios(context).post(url).then(resp=>{ 
+          Axios(context).post(url).then(resp=>{
             resolve(resp)
           }, error => {
             reject(error)
@@ -529,44 +579,44 @@ export const store = new Vuex.Store({
         })
       }
     },
-    
+
     postBeginService(context, citizen_id) {
-      return new Promise((resolve, reject) => { 
+      return new Promise((resolve, reject) => {
         let url = `/citizens/${citizen_id}/begin_service/`
-        Axios(context).post(url,{}).then(resp=>{ 
+        Axios(context).post(url,{}).then(resp=>{
           resolve(resp)
         }, error => {
           reject(error)
         })
       })
     },
-    
+
     postFinishService(context, citizen_id) {
-      return new Promise((resolve, reject) => { 
+      return new Promise((resolve, reject) => {
         let url = `/citizens/${citizen_id}/finish_service/`
-        Axios(context).post(url).then(resp=>{ 
+        Axios(context).post(url).then(resp=>{
           resolve(resp)
         }, error => {
           reject(error)
         })
       })
     },
-    
+
     postAddToQueue(context, citizen_id) {
-      return new Promise((resolve, reject) => { 
+      return new Promise((resolve, reject) => {
         let url = `/citizens/${citizen_id}/add_to_queue/`
-        Axios(context).post(url,{}).then(resp=>{ 
+        Axios(context).post(url,{}).then(resp=>{
           resolve(resp)
         }, error => {
           reject(error)
         })
       })
     },
-    
+
     postCitizenLeft(context, citizen_id) {
-      return new Promise((resolve, reject) => { 
+      return new Promise((resolve, reject) => {
         let url = `/citizens/${citizen_id}/citizen_left/`
-        Axios(context).post(url).then(resp=>{ 
+        Axios(context).post(url).then(resp=>{
           resolve(resp)
         }, error => {
           reject(error)
@@ -575,16 +625,22 @@ export const store = new Vuex.Store({
     },
 
     addCitizen(context) {
-      context.commit('toggleEditModal', false)
+      context.dispatch('toggleModalBack')
       Axios(context).post('/citizens/', {})
         .then(resp => {
           let value = resp.data.citizen
           context.commit('updateModalForm', {type:'citizen',value})
           context.commit('toggleAddCitizen', true)
         })
-      context.dispatch('getCategories')
-      context.dispatch('getChannels')
-      context.dispatch('getServices')
+      if (context.state.categories.length == 0) {
+        context.dispatch('getCategories')
+      }
+      if (context.state.channels.length == 0) {
+        context.dispatch('getChannels')
+      }
+      if (context.state.services.length == 0) {
+        context.dispatch('getServices')
+      }
     },
 
     dashTableRow(context, payload) {
@@ -594,12 +650,13 @@ export const store = new Vuex.Store({
 
     resetAddCitizenModal(context) {
       context.commit('toggleAddCitizen', false)
+      context.dispatch('toggleModalBack')
       context.commit('resetAddCitizen')
     },
 
     cancelAddCitizensModal(context) {
       let { citizen_id } = context.getters.form_data.citizen
-      
+
       context.dispatch('postCitizenLeft', citizen_id)
         .then( () => {
           context.commit('toggleAddCitizen', false)
@@ -609,7 +666,8 @@ export const store = new Vuex.Store({
 
     resetEditModal(context) {
       context.commit('toggleServiceModal', true)
-      context.commit('toggleEditModal', false)
+      context.commit('toggleAddModal', false)
+      context.dispatch('toggleModalBack')
     },
 
     messageSlack(context, payload) {
@@ -642,15 +700,15 @@ export const store = new Vuex.Store({
       state.categories = []
       state.categories = payload
     },
-    
+
     updateModalForm(state, payload) {
       Vue.set(
-        state.addCitizenModal.formData, 
+        state.addCitizenModal.formData,
         payload.type,
-        payload.value 
+        payload.value
       )
     },
-    
+
     toggleAddCitizen(state, payload) {
         Vue.set(
           state,
@@ -661,7 +719,7 @@ export const store = new Vuex.Store({
 
     resetAddCitizen(state) {
       let { formData } = state.addCitizenModal
-      
+
       let keys = Object.keys(formData)
       keys.forEach( key => {
         Vue.set(
@@ -670,8 +728,8 @@ export const store = new Vuex.Store({
           ''
         )
       })
-    }, 
-    
+    },
+
     editInvitedCitizen(state,payload) {
       Vue.set(
         state.invitedCitizen,
@@ -679,7 +737,17 @@ export const store = new Vuex.Store({
         payload.value
       )
     },
-    
+
+    editInvitedQuantity(state,payload) {
+      let { req } = state
+      Vue.set(
+        state.invitedCitizen.service_reqs[req],
+        payload.type,
+        payload.value
+      )
+    },
+
+
     setInvitedCitizen(state, payload) {
       Vue.set(
         state,
@@ -687,20 +755,20 @@ export const store = new Vuex.Store({
         payload
       )
     },
-    
+
     resetInvitedCitizen(state) {
-      let { invitedCitizen } = state 
+      let { invitedCitizen } = state
       Vue.set(
         state,
         'invitedCitizen',
         invitedCitizen
       )
     },
-     
+
     toggleServiceModal: (state,payload)=>state.showServiceModal=payload,
-    
+
     toggleServeNow: (state,payload) => state.serveNowDisabled = payload,
-    
+
     setAlert(state, payload) {
       state.alertMessage = payload
       state.dismissCountDown = 5
@@ -709,13 +777,13 @@ export const store = new Vuex.Store({
       state.inviteButtonDisabled = true
       state.serveButtonDisabled = false
       state.addCitizenDisabled = true
-      state.backOfficeDisabled = true  
+      state.backOfficeDisabled = true
     },
     enableButtons(state) {
       state.inviteButtonDisabled = false
       state.serveButtonDisabled = true
       state.addCitizenDisabled = false
-      state.backOfficeDisabled = false  
+      state.backOfficeDisabled = false
     },
     dismissCountDown(state,payload) {
       state.dismissCountDown = payload
@@ -739,15 +807,19 @@ export const store = new Vuex.Store({
     enableFinish(state) {
       state.finishDisabled = false
     },
-    toggleEditModal(state, payload) {
+    toggleModalSetup(state, payload) {
+      state.addModalSetup = payload
+    },
+
+    toggleAddModal(state, payload) {
       state.editModal = payload
     },
-    
+
     setDataForEditModal(state) {
       let citizen = state.invitedCitizen
       let quick
       citizen.qt_xn_citizen_ind==0 ? quick=false : quick=true
-      
+
       let formData = {
         comments: citizen.citizen_comments,
         quick,
@@ -764,8 +836,19 @@ export const store = new Vuex.Store({
         )
       })
     },
-    
-    switchReqs: (state, payload) => state.req = payload
+
+    switchReqs: (state, payload) => state.req = payload,
+
+    editInvitedCitizenServices(state, payload) {
+      let n = state.invitedCitizen.service_reqs.length
+
+      Vue.set(
+        state.invitedCitizen.service_reqs,
+        n,
+        payload
+      )
+    },
+    setCurrentQuantity: (state, payload) => state.currentQuantity = payload
 
   }
 })
