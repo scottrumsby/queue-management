@@ -2,7 +2,7 @@
 
 <template>
     <b-modal id="serve_citizen_modal"
-             :visible="this.$store.state.showServiceModal"
+             :visible="showServiceModal"
              size="lg"
              hide-header
              hide-footer
@@ -19,14 +19,14 @@
                    fluid>
         <b-row no-gutters class="p-2">
           <b-col cols="6">
-            <div>Ticket #: <strong>{{citizen.ticket_number}}</strong></div>
+             <div>Ticket #: <strong>{{citizen.ticket_number}}</strong></div>
             <div>Channels: <strong>{{channel.channel_name}}</strong></div>
             <div class="pt-3">
               <b-button @click="clickServiceBeginService"
-                        :disabled="serveBeginServiceDisabled"
+                        :disabled="serviceBegun===true"
                         class="btn-primary">Begin Service</b-button>
               <b-button @click="clickReturnToQueue"
-                        :disabled="serveReturnQueueDisabled"
+                        :disabled="serviceBegun===true"
                         class="btn-primary">Return to Queue</b-button>
               <b-button @click="clickCitizenLeft"
                         class="btn-danger">Citizen Left</b-button>
@@ -67,13 +67,13 @@
           <b-col cols="2" />
           <b-col cols="3">
             <b-button @click="clickHold"
-                      :disabled="finishDisabled"
+                      :disabled="serviceBegun===false"
                       class="w-75 btn-primary">Place on Hold</b-button>
           </b-col>
           <b-col cols="2" />
           <b-col cols="3">
-            <b-button @click="clickFinishService"
-                      :disabled="finishDisabled"
+            <b-button @click="clickServiceFinish"
+                      :disabled="serviceBegun===false"
                       class="w-75 btn-primary" >Finish</b-button>
           </b-col>
           <b-col cols="2" />
@@ -87,7 +87,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters, mapMutations, mapActions } from 'vuex'
+import { mapState, mapGetters, mapActions } from 'vuex'
 import ServeCitizenTable from './serve-citizen-table'
 
 export default {
@@ -105,69 +105,44 @@ export default {
     ...mapState([
       'showServiceModal',
       'invitedCitizen',
-      'serveBeginServiceDisabled',
-      'serveCitizenLeftDisabled',
-      'serveReturnQueueDisabled',
-      'finishDisabled'
+      'serviceBegun'
     ]),
 
     citizen() {
-    return this.invitedCitizen
-  },
+      return this.invitedCitizen
+    },
 
     comments: {
       get() { return this.citizen.citizen_comments },
       set(value) {
         this.$store.commit('editInvitedCitizen',{type:'citizen_comments',value})
-      }},
-      options() {
-        let { service_reqs } = this.citizen
-
-        if (service_reqs.length === 1 || !service_reqs) {
-          return [{text:'no other services', value: null}]
-        } else if (service_reqs.length > 1) {
-          let array_options = service_reqs.map(req =>
-          ({text:req.service.service_name, value:req.service.service_name})
-        )
-        return array_options
-        }
-      },
-
-    channel() {
-      if (this.citizen) {
-        return this.citizen.service_reqs[0].channel
-      } else {
-        return ''
       }
-    }},
+    },
+    
+   channel() {
+     if (
+       !this.citizen ||
+       !this.citizen.service_reqs ||
+       this.citizen.service_reqs.length === 0 
+     ) {
+       return ''
+     }
+     return this.citizen.service_reqs[0].channel
+   }
+  },
 
   methods: {
     ...mapActions([
       'clickCitizenLeft',
       'clickServiceBeginService',
-      'clickServiceModalClose',
-      'clickFinishService',
+      'clickServiceFinish',
       'clickReturnToQueue',
       'clickHold',
       'clickAddService'
     ]),
-    ...mapMutations(
-      {
-        toggleService: 'toggleServiceModal',
-        editServices: 'editServicesFromServe',
-        toggleAdd: 'toggleAddCitizen'
-      }
-    ),
-
+    
     closeWindow() {
       this.$store.dispatch('clickServiceModalClose')
-    },
-    beginService(item, index) {
-      this.postBeginService()
-      this.toggleService(false)
-    },
-    clickEdit() {
-      this.editServices()
     }
   }
 }

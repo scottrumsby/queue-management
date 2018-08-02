@@ -82,13 +82,13 @@ export default {
 
       quickTrans: {
         get() { return this.form_data.quick },
-        set(value) { this.updateModalForm({type:'quick',value}) }
+        set(value) { this.updateAddModalForm({type:'quick',value}) }
       }
     },
 
     methods: {
       ...mapActions(['cancelAddCitizensModal']),
-      ...mapMutations(['updateModalForm']),
+      ...mapMutations(['updateAddModalForm']),
 
       countDownChanged (dismissCountDown) {
         this.dismissCountDown = dismissCountDown
