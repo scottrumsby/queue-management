@@ -11,14 +11,14 @@
                  id="serve-table"
                  fixed
                  bordered
-                 style="text-align: center"
+                 style="text-align: center; veritcal-align: middle"
                  >
-                 <template slot="active" slot-scope="row">
-                   <div v-if="row.index === 0">
-                     <b-badge variant="success">Active</b-badge>
+                 <template slot="status" slot-scope="row">
+                   <div v-if="row.index === 0" >
+                     <b-badge variant="success">Active </b-badge>
                    </div>
                    <div v-if="row.index > 0">
-                     <b-button size="sm" variant="link">make active</b-button>
+                     Finished
                    </div>
                  </template>
                  <div style="al"
@@ -53,7 +53,7 @@ export default {
       return {
         text1: '',
         fields: [
-          {key:'active', label: 'Active'},
+          {key:'status', label: 'Status'},
           {key:'service.parent.service_name', label:'Category'},
           {key:'service.service_name', label:'Service'},
           {key:'quantity', label:'Quantity'},
@@ -84,9 +84,4 @@ export default {
   }
 </script>
 
-<style>
 
-  #serve-table > tbody > tr:nth-child(1) {
-    background-color: #C6FAAF;
-  }
-</style>

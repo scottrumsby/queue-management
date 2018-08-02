@@ -54,7 +54,7 @@
           <b-col cols="7"/>
         
           <b-col cols="auto" style="align: right">
-            <b-button class="w-100" @click="clickAddService">Add Next Service</b-button>
+            <b-button class="w-100" @click="clickAddService" :disabled="serviceBegun===false">Add Next Service</b-button>
           </b-col>
           <b-col cols="2"/>
         </b-row>
