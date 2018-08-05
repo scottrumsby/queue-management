@@ -72,8 +72,8 @@ limitations under the License.*/
       </b-row>
 
       <b-row no-gutters>
-        <b-col>
-          Citizens on Hold: {{on_hold_queue.length}}
+        <b-col id="citizen-hold-count">
+          Citizens on Hold: {{on_hold.length}}
         </b-col>
       </b-row>
 
