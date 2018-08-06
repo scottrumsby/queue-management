@@ -1,70 +1,128 @@
 
 
-<template>
-  <b-table :fields="fields"
-           :items="items"
-           head-variant="light"
-           small
-           outlined
-           hover
-           fixed
-           bordered
-           style="text-align: center"
-           class="p-0 m-0">
-    <template slot="start_time" slot-scope="data">
-      {{ formatTime(data.item.start_time) }}
-    </template>
-    <template slot="quantity" slot-scope="data">
-      <div style="display: none">
-        {{text1=data.item.service_reqs[0].quantity}}
-      </div>
-      <div class="w-100">
-        <b-form-input v-model="text1"
-                      type="text"
-                      size="sm"
-                      class="w-25 mx-auto"></b-form-input>
-      </div>
-    </template>
-    <template slot="editBut" slot-scope="row">
-      <b-button @click="clickEdit" >
-        edit
-      </b-button>
-    </template>
-  </b-table>
+<template>  
+  <b-container class="mt-4">
+    <b-row>
+      <b-col>
+        <b-table 
+        :fields="fields"
+        :items="invited_service_reqs"
+        head-variant="light"
+        small
+        id="serve-table"
+        fixed
+        bordered
+        style="text-align: center"
+        >
+          <template slot="status" slot-scope="row">
+            <div v-if="row.item.periods.some(p=>p.time_end===null)===true">
+              <b-badge variant="success" size="sm">
+                <h6 class="pt-1 px-2" style="font-size: 15px">
+                  Active
+                </h6> 
+              </b-badge>
+            </div>
+            <div v-if="row.item.periods.some(p=>p.time_end===null)===false">
+              Innactive
+            </div>
+          </template>
+          
+          <template slot="quantity" slot-scope="row">
+            <div v-if="row.item.periods.some(p=>p.time_end===null)===true" >
+              <div class="w-25" style="margin: auto">
+                <b-input :value="getQuantity()" @input="setQuantity" size="sm"></b-input>
+              </div>
+            </div>
+            <div v-if="row.item.periods.some(p=>p.time_end===null)===false">
+              {{ invited_service_reqs[row.index].quantity }}
+            </div>
+          </template>
+          
+          <template slot="service.service_name" slot-scope="row">
+            {{ row.item.service.service_name }}
+            <div style="display: none">
+              {{ 
+                row.item.periods.some(p=>p.time_end===null) ? 
+                   row.item._rowVariant='info' : row.item._rowVariant='' 
+              }}
+            </div>
+          </template>
+              
+          <template slot="editBut"  slot-scope="row">
+            <div v-if="row.item.periods.some(p=>p.time_end===null)===true" >
+              <b-button size="sm" @click="clickEdit">
+                edit
+              </b-button>
+            </div>
+            <div v-if="row.item.periods.some(p=>p.time_end===null)===false">
+              <b-button size="sm" variant="link" @click="clickMakeActive(row.item.sr_id)">
+              make active
+              </b-button>
+            </div>
+          </template>
+        </b-table>
+      </b-col>
+    </b-row>
+  </b-container>
 </template>
 
 <script>
 import { mapState, mapGetters, mapMutations, mapActions } from 'vuex'
 
 export default {
-    name: 'ServeCitizenTable',
-    data() {
-      return {
-        text1: '',
-        fields: [
-          {key:'service_reqs[0].service.parent.service_name', label:'Category'},
-          {key:'service_reqs[0].service.service_name', label:'Service'},
-          {key:'start_time', label:'Stand Time'},
-          {key:'quantity', label:'Quantity'},
-          {key:'editBut', label:'Change Service'},
-        ]
-      }
+  name: 'ServeCitizenTable',
+  
+  data() {
+    return {
+      fields: [
+        {key:'status', label: 'Status', thStyle:'text-align: center; font-size: 15px'},
+        {key:'service.parent.service_name', label:'Category', thStyle:'text-align: center; font-size: 15px'},
+        {key:'service.service_name', label:'Service', thStyle:'text-align: center; font-size: 15px'},
+        {key:'quantity', label:'Quantity', thStyle:'text-align: center; font-size: 15px'},
+        {key:'editBut', label:'Change Service', thStyle:'text-align: center; font-size: 15px'}
+      ]
+    }
+  },
+  
+  computed: {
+    ...mapState(['serviceModalForm']),
+    ...mapGetters([
+      'invited_service_reqs', 
+      'active_service',
+      'active_index'
+    ])
+  },
+  
+  methods: {
+    ...mapActions([
+      'clickEdit', 
+      'clickMakeActive'
+    ]),
+    ...mapMutations(['editServiceModalForm']),
+    
+    formatTime(data) {
+      let time = new Date(data)
+      return time.toLocaleTimeString()
     },
-    computed: {
-      ...mapState({
-        citizen: 'invitedCitizen',
-      }),
-      items() {
-        return [this.citizen]
-      }
+    
+    setQuantity(value) {
+      this.editServiceModalForm({
+        type: 'activeQuantity',
+        value
+      })
     },
-    methods: {
-      ...mapActions(['clickEdit']),
-
-      formatTime(data) {
-        let time = new Date(data)
-        return time.toLocaleTimeString()
+    
+    getQuantity() { 
+      if (!this.serviceModalForm.activeQuantity) {
+        return ''
+      } else {
+        return this.serviceModalForm.activeQuantity
       }
     }
   }
+}
 </script>
+
+
+
+

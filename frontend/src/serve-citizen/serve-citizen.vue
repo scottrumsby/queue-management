@@ -2,13 +2,14 @@
 
 <template>
     <b-modal id="serve_citizen_modal"
-             :visible="this.$store.state.showServiceModal"
+             :visible="showServiceModal"
              size="lg"
              hide-header
              hide-footer
              no-close-on-backdrop
              no-close-on-esc
-             class="m-0 p-0">
+             @show="resetChecked()"
+             class="m-0 p-0 serve-table">
 
      <div style="display: flex; flex-direction: row; justify-content: space-between" class="modal_header">
        <div><h5>Serve Citizen</h5></div>
@@ -23,15 +24,15 @@
             <div>Channels: <strong>{{channel.channel_name}}</strong></div>
             <div class="pt-3">
               <b-button @click="clickServiceBeginService"
-                        :disabled="serveBeginServiceDisabled"
-                        class="btn-primary"
+                        :disabled="serviceBegun===true"
+                        class="btn-primary serve-btn"
                         id="serve-citizen-begin-service-button">Begin Service</b-button>
               <b-button @click="clickReturnToQueue"
-                        :disabled="serveReturnQueueDisabled"
-                        class="btn-primary"
+                        :disabled="serviceBegun===true"
+                        class="btn-primary serve-btn"
                         id="serve-citizen-return-to-queue-button">Return to Queue</b-button>
               <b-button @click="clickCitizenLeft"
-                        class="btn-danger"
+                        class="btn-danger serve-btn"
                         id="serve-citizen-citizen-left-button">Citizen Left</b-button>
             </div>
           </b-col>
@@ -49,18 +50,17 @@
         </b-row>
       </b-container>
       <ServeCitizenTable/>
+      
       <b-container fluid
                    id="serve-light-inner-container"
                    class="pt-3 mt-3 mb-4">
         <b-row no-gutters>
-          <b-col cols="2"/>
-          <b-col cols="3"><b-form-select v-model="selected"
-                                         :options="options"
-                                         v-if="f" />
-          </b-col>
-          <b-col cols="2"/>
-          <b-col cols="3" style="align: right">
-            <b-button v-if="f" class="w-75">Add Next Service</b-button>
+          <b-col cols="7"/>
+        
+          <b-col cols="auto" style="align: right">
+            <b-button class="w-100 btn-primary serve-btn" @click="clickAddService" :disabled="serviceBegun===false">
+              Add Next Service
+            </b-button>
           </b-col>
           <b-col cols="2"/>
         </b-row>
@@ -69,21 +69,30 @@
       <b-container fluid
                    id="add-citizen-modal-footer"
                    class="pt-3 mt-5">
-        <b-row no-gutters>
+        <b-row no-gutters align-h="center">
           <b-col cols="2" />
           <b-col cols="3">
             <b-button @click="clickHold"
-                      :disabled="finishDisabled"
-                      class="w-75 btn-primary"
+                      :disabled="serviceBegun===false"
+                      class="w-75 btn-primary serve-btn"
                       id="serve-citizen-place-on-hold-button">Place on Hold</b-button>
           </b-col>
           <b-col cols="2" />
           <b-col cols="3">
-            <b-button @click="clickFinishService"
-                      :disabled="finishDisabled"
-                      class="w-75 btn-primary"
-                      id="serve-citizen-finish-button">Finish</b-button>
-
+            <b-button @click="serviceFinish"
+                      :disabled="serviceBegun===false"
+                      class="w-75 btn-primary serve-btn" 
+                      id="serve-citizen-finish-button">
+                        Finish
+                    </b-button>
+            <div v-if="serviceBegun===true" class="px-3 pt-1">
+              <b-form-checkbox v-model="checked" 
+                               value="yes"
+                               unchecked-value="no"
+                               >
+                <span style="font-size: 17px;">Innacurate Time</span>
+              </b-form-checkbox>
+            </div>
           </b-col>
           <b-col cols="2" />
         </b-row>
@@ -96,7 +105,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters, mapMutations, mapActions } from 'vuex'
+import { mapState, mapGetters, mapActions, mapMutations } from 'vuex'
 import ServeCitizenTable from './serve-citizen-table'
 
 export default {
@@ -107,83 +116,83 @@ export default {
   data() {
     return {
       selected: '',
-      f: false
+      f: false,
+      t: true,
+      checked: null
     }
   },
   computed: {
     ...mapState([
       'showServiceModal',
-      'invitedCitizen',
-      'serveBeginServiceDisabled',
-      'serveCitizenLeftDisabled',
-      'serveReturnQueueDisabled',
-      'finishDisabled'
+      'serviceBegun',
+      'serviceModalForm'
     ]),
+    
+    ...mapGetters(['invited_citizen', 'active_service', 'invited_service_reqs']),
 
     citizen() {
-    return this.invitedCitizen
-  },
+      if (!this.invited_citizen) {
+        return {ticket_number: ''}
+      }
+      return this.invited_citizen
+    },
 
     comments: {
-      get() { return this.citizen.citizen_comments },
-      set(value) {
-        this.$store.commit('editInvitedCitizen',{type:'citizen_comments',value})
-      }},
-      options() {
-        let { service_reqs } = this.citizen
-
-        if (service_reqs.length === 1 || !service_reqs) {
-          return [{text:'no other services', value: null}]
-        } else if (service_reqs.length > 1) {
-          let array_options = service_reqs.map(req =>
-          ({text:req.service.service_name, value:req.service.service_name})
-        )
-        return array_options
-        }
+      get() {
+        return this.serviceModalForm.citizen_comments
       },
+      set(value) {
+        this.editServiceModalForm({
+          type: 'citizen_comments',
+          value
+        })
+      }
+    },
 
     channel() {
-      if (this.citizen) {
-        return this.citizen.service_reqs[0].channel
-      } else {
-        return ''
+      if (!this.active_service) {
+        return {channel_name: '', channel_id: ''}
       }
-    }},
+      return this.active_service.channel
+    }
+  },
 
   methods: {
     ...mapActions([
       'clickCitizenLeft',
-      'postBeginService',
-      'editServiceButton',
       'clickServiceBeginService',
-      'clickServiceModalClose',
-      'clickFinishService',
+      'clickServiceFinish',
       'clickReturnToQueue',
-      'clickHold'
+      'clickHold',
+      'clickAddService',
+      'putInaccurateIndicator'
     ]),
-    ...mapMutations(
-      {
-        toggleService: 'toggleServiceModal',
-        editServices: 'editServicesFromServe',
-        toggleAdd: 'toggleAddCitizen'
+    ...mapMutations(['editServiceModalForm']),
+
+    serviceFinish() {
+      if (this.checked === 'yes') {
+        this.putInaccurateIndicator().then(() => {
+          this.clickServiceFinish()
+        })
+      } else {
+        this.clickServiceFinish()
       }
-    ),
+    },
+
+    resetChecked() {
+      this.checked = 'no'
+    },
 
     closeWindow() {
       this.$store.dispatch('clickServiceModalClose')
-    },
-    beginService(item, index) {
-      this.postBeginService()
-      this.toggleService(false)
-    },
-    clickEdit() {
-      this.editServices()
     }
   }
 }
 
 </script>
 <style>
+
+
 
 #serve_citizen_modal > div > div {
   width: 1200px !important;
@@ -197,16 +206,19 @@ export default {
   background-color: WhiteSmoke;
 }
 
+
+
 #add-citizen-modal-footer {
   border: 1px solid grey;
   border-radius: 0px 0px 9px 9px;
   background-color: WhiteSmoke;
 }
-
-#serve-citizen-footer-button {
-  color: dimgrey;
-  background-color: WhiteSmoke;
-  border: .75px solid lightgrey;
-  font-size: 17px;
+.disabled {
+  background-color: #8e9399 !important;
+  color: Gainsboro !important;
 }
+.disabled:hover {
+  background-color: #8e9399 !important;
+}
+
 </style>

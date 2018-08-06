@@ -32,19 +32,19 @@ limitations under the License.*/
             <div>
               <b-button class="m-1 btn-primary"
                         @click="invite"
-                        :disabled="inviteButtonDisabled"
+                        :disabled="citizenInvited===true"
                         id="invite-citizen-button">Invite</b-button>
               <b-button class="m-1 btn-primary"
                         @click="clickServeNow"
-                        :disabled="serveButtonDisabled"
+                        :disabled="citizenInvited===false"
                         id="serve-citizen-button">Serve Now</b-button>
             </div>
             <div>
               <b-button class="m-1 btn-primary"
-                        @click="addCitizen"
-                        :disabled="addCitizenDisabled"
+                        @click="clickAddCitizen""
+                        :disabled="citizenInvited===true"
                         id="add-citizen-button">Add Citizen</b-button>
-              <b-button class="m-1" v-if="f" :disabled="backOfficeDisabled">Back Office</b-button>
+              <b-button class="m-1" v-if="f" :disabled="citizenInvited===true">Back Office</b-button>
             </div>
           </div>
         </b-col>
@@ -72,8 +72,8 @@ limitations under the License.*/
       </b-row>
 
       <b-row no-gutters>
-        <b-col id="citizen-hold-count">
-          Citizens on Hold: {{on_hold.length}}
+        <b-col>
+          Citizens on Hold: {{on_hold_queue.length}}
         </b-col>
       </b-row>
 
@@ -122,39 +122,33 @@ import ServeCitizen from './serve-citizen'
     computed: {
       ...mapState([
         'isLoggedIn',
-        'inviteButtonDisabled',
-        'serveButtonDisabled',
-        'addCitizenDisabled',
-        'backOfficeDisabled',
+        'citizenInvited',
         'dismissCountDown'
       ]),
-      ...mapGetters(['filtered_citizens', 'on_hold']),
+      ...mapGetters(['citizens_queue', 'on_hold_queue']),
 
       queueLength() {
-        return this.filtered_citizens.length
+        return this.citizens_queue.length
       }
     },
 
     methods: {
-      ...mapMutations(['setAlert']),
+      ...mapMutations(['setMainAlert']),
       ...mapActions([
         'clickInvite',
-        'addCitizen',
+        'clickAddCitizen',
         'clickServiceModalClose',
         'clickCitizenLeft',
-        'clickServeNow'
+        'clickServeNow',
+        'clickBackOffice'
       ]),
 
       invite() {
         if (this.queueLength === 0) {
-          this.setAlert('The are currently no citizens to invite.')
+          this.setMainAlert('The are currently no citizens to invite.')
         } else {
           this.clickInvite()
         }
-      },
-
-      toggleModal() {
-        this.toggleServeNow(true)
       },
 
       countDownChanged(dismissCountDown) {
