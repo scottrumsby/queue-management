@@ -17,7 +17,7 @@ limitations under the License.*/
 import Vue from 'vue'
 import 'es6-promise/auto'
 import Vuex from 'vuex'
-import { Axios } from './helpers'
+import { Axios, formData, invitedCitizen } from './helpers'
 
 
 Vue.use(Vuex)
