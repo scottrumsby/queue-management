@@ -1,7 +1,7 @@
 
 
 <template>
-    <b-modal id="add_citizen_modal"
+    <b-modal 
              :visible="showAddModal"
              size="lg"
              hide-header
@@ -9,6 +9,7 @@
              no-close-on-backdrop
              no-close-on-esc
              class="m-0 p-0"
+             @shown="focusref()"
              >
 
        <div style="display: flex; flex-direction: row; justify-content: space-between" class="modal_header">
@@ -37,7 +38,6 @@
         <Buttons />
       </b-row>
       </b-container>
-
     </b-modal>
 </template>
 
@@ -93,11 +93,24 @@ export default {
       countDownChanged (dismissCountDown) {
         this.dismissCountDown = dismissCountDown
       },
+      
+      focusref() {
+        this.$root.$emit('focusinput')
+      },
 
       showAlert () {
         this.dismissCountDown = this.dismissSecs
       }
     }
   }
-
 </script>
+<style>
+  
+  .disabled {
+    background-color: #8e9399 !important;
+    color: Gainsboro !important;
+  }
+  .disabled:hover {
+    background-color: #8e9399 !important;
+  }
+</style>
