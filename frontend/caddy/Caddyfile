@@ -6,4 +6,4 @@ log stdout
 
 errors stdout
 
-rewrite .* /
+rewrite .* /index.html
