@@ -15,21 +15,55 @@ limitations under the License.*/
 
 
 <template>
-  <div id="smartboard">
-    It is {{ date() }} at {{ now() }}
+  <div class="smart-board">
+    <b-container class="mt-3" style="font-size: 3em; width: 100%; text-align: center;">Welcome to Service BC</b-container>
+    <p style="font-size: 20px; padding-left: 25px">Citizens waiting: {{ queueLength }}</p>
+    <div style="display: flex;
+  justify-content: space-around;">
+      <div>
+        <Video />
+      </div>
+      <div style="border: 9px solid steelblue; width: 25%;">
+        <b-table :items="data.citizens"
+                 :fields="fields"
+                 size="lg"
+                 striped
+                 style="width: 100%"
+                 thead-tr-class="table-head"
+                 tbody-class="table-body-sb"
+                 >
+          <template slot="state" slot-scope="data">
+            <div v-if="data.value==='Invited'" style="color: green">{{data.value}}</div>
+          </template>
+        </b-table>
+      </div>
+    </div>
+    
+  
   </div>
 </template>
 
 <script>
 import Socket from './Socket'
 import axios from 'axios'
+import Video from './video'
 
 export default {
   name: 'Smartboard',
-  
+  mounted() {
+    setInterval( () => { this.now() }, 5000)
+  },
+  components: { Video },
   data() {
     return {
-      options: { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' },
+      time: '',
+      fields: [
+        {key: 'ticket_number', label: 'Ticket'},
+        {key: 'state', label: 'Status', thClass: 'd-none', tdClass: 'd-none'},
+        {label: 'Counter'}
+      ],
+      options: { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',  },
+      timeOpts: {hour12: true, hour: 'numeric', minute: '2-digit'},
       data: {
         "office_type": "callbynumber",
         "citizens": [
@@ -57,12 +91,20 @@ export default {
       },
       Axios: axios.create({
         baseURL: process.env.API_URL,
+        method: 'get',
+        url: '/smartboard/',
         withCredentials: true,
         headers: {
           'Accept': 'application/json'
         }
-      }),
-      time: new Date()
+      })
+    }
+  },
+  
+  computed: {
+    queueLength() {
+      return this.data.citizens.filter(d=>d.state === 'Waiting').length
+      
     }
   },
   
@@ -71,16 +113,35 @@ export default {
       let d = new Date()
       return d.toLocaleDateString('en-CA', this.options)
     },
+    
     now() {
-      return null
+      console.log('this time');
+      let d = new Date()
+      this.time = d.toLocaleTimeString('en-CA', this.timeOpts)
     },
     getSomething() {
-      this.Axios('/smartboard/').then( resp => {
+      this.Axios('').then( resp => {
         this.hello = resp.data.office_type
       })
     }
   }
 }
 </script>
+<style>
+  .smart-board {
+    position: fixed; 
+    z-index: 1; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+    background: linear-gradient(LemonChiffon, white, LightSkyBlue);
+  }
+  
+  .table-head {
+    font-size: 1.8em;
+  }
+</style>
 
 
