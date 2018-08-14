@@ -816,14 +816,6 @@ export const store = new Vuex.Store({
         value: quantity
       })
     },
-
-    setAddModalData(context) {
-      let data = {
-        citizen: context.getters.invited_citizen,
-        active_service: context.getters.active_service
-      }
-      context.commit('setAddModalData', data)
-    },
     
     setAddModalData(context) {
       let data = {
@@ -831,14 +823,6 @@ export const store = new Vuex.Store({
         active_service: context.getters.active_service
       }
       context.commit('setAddModalData', data)
-    },
-    
-    setServedCitizenId(context, payload) {
-      let data = {
-        type: 'citizen_id',
-        value: payload
-      }
-      context.commit('editServiceModalForm', data)
     },
 
     setServedCitizenId(context, payload) {

@@ -84,7 +84,7 @@ export default {
   name: 'CallByNumber',
   
   mounted() {
-    this.$root.$on('addToBoard',( data) => { this.updateBoard(data) })
+    this.$root.$on('addToBoard',() => { this.updateBoard() })
     setInterval( () => { this.now() }, 3000)
     this.initializeBoard()
   },
@@ -148,11 +148,11 @@ export default {
       }
     },
     url() {
-      return `/smartboard/?office_id=${this.office_id}`
+      return `/smartboard/?office_number=${this.office_id}`
     },
     invited() {
       if (this.citizens && this.citizens.length > 0) {
-        let citizens = this.citizens.filter(c=>c.state === 'Invited')
+        let citizens = this.citizens.filter(c=>c.active_period.ps.ps_name === 'Invited')
         if (citizens.length > 8) {
           this.overflow = citizens.slice(8, (citizens.length-1))
           this.showOverflow = true
@@ -167,7 +167,7 @@ export default {
     },
     waiting() {
       if (this.citizens && this.citizens.length > 0) {
-        return this.citizens.filter(c=>c.state === 'Waiting').length
+        let citizens = this.citizens.filter(c=>c.active_period.ps.ps_name === 'Waiting').length
       }
       return 0
     },
@@ -185,24 +185,7 @@ export default {
         this.$root.$emit('boardConnect', this.office_id)
       })
     },
-    updateBoard(ticketId) {
-      let ticketFlash = () => {
-        this.highlighted.push(ticketId)
-        setTimeout( () => { ticketUnFlash() }, 300)
-      }
-      let ticketUnFlash = () => {
-        let i = this.highlighted.indexOf(ticketId)
-        this.highlighted.splice(i, 1)
-      }
-      let clearFlasher = () => {
-        clearInterval(interval)
-        let i = this.highlighted.indexOf(ticketId)
-        if (i >= 0) {
-          this.highlighted.splice(i, 1)
-        }
-      }
-      let interval = setInterval( () => { ticketFlash() }, 600 )
-      setTimeout( () => { clearFlasher() }, 5000)
+    updateBoard() {
       Axios.get(this.url).then( resp => {
         this.citizens = resp.data.citizens
       })

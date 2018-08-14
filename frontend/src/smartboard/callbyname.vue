@@ -78,11 +78,11 @@ export default {
       }
     },
     url() {
-      return `/smartboard/?office_id=${this.office_id}`
+      return `/smartboard/?office_number=${this.office_id}`
     },
     waiting() {
       if (this.citizens && this.citizens.length > 0) {
-        return this.citizens.filter(c=>c.state === 'Waiting').length
+        let citizens = this.citizens.filter(c=>c.active_period.ps.ps_name === 'Waiting').length
       }
       return 0
     },

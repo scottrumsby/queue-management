@@ -77,7 +77,7 @@ limitations under the License.*/
         )
         socket.on(
           'citizen_invited', 
-          (data) =>{ this.onUpdateBoard(data) } 
+          () =>{ this.onUpdateBoard() }
         )
       },
 //LISTENER METHODS
@@ -103,8 +103,8 @@ limitations under the License.*/
           console.log('boardSocket received: "joinSmartboardRoomFail"')
         }
       },
-      onUpdateBoard(data) {
-        this.$root.$emit('addToBoard', data.citizen)
+      onUpdateBoard() {
+        this.$root.$emit('addToBoard')
         console.log('socket received: "onUpdateBoard"')
       }
     }

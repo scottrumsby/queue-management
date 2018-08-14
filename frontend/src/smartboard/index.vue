@@ -62,7 +62,7 @@ export default {
       }
     },
     url() {
-      return `/smartboard/?office_id=${this.office_id}`
+      return `/smartboard/?office_number=${this.office_id}`
     }  
   },
     
