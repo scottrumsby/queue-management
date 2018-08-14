@@ -15,7 +15,7 @@ limitations under the License.'''
 
 from qsystem import db
 from .base import Base 
-from app.models import Period, PeriodState
+from app.models import Period, PeriodState, SRState
 from datetime import datetime
 
 
@@ -42,6 +42,27 @@ class ServiceReq(Base):
 
         return sorted_periods[-1]
 
+    def set_active(self):
+        active_sr_state = SRState.query.filter_by(sr_code='Active').first()
+
+        if self.sr_state_id != active_sr_state.sr_state_id:
+            self.sr_state_id = active_sr_state.sr_state_id
+            db.session.add(self)
+
+    def set_pending(self):
+        active_sr_state = SRState.query.filter_by(sr_code='Pending').first()
+
+        if self.sr_state_id != active_sr_state.sr_state_id:
+            self.sr_state_id = active_sr_state.sr_state_id
+            db.session.add(self)
+
+    def set_complete(self):
+        active_sr_state = SRState.query.filter_by(sr_code='Complete').first()
+
+        if self.sr_state_id != active_sr_state.sr_state_id:
+            self.sr_state_id = active_sr_state.sr_state_id
+            db.session.add(self)
+
     def invite(self, csr):
         active_period = self.get_active_period()
         active_period.time_end = datetime.now()
@@ -59,6 +80,8 @@ class ServiceReq(Base):
         )
 
         db.session.add(new_period)
+
+        self.set_pending()
 
     def add_to_queue(self, csr):
         active_period = self.get_active_period()
@@ -78,6 +101,8 @@ class ServiceReq(Base):
 
         db.session.add(new_period)
 
+        self.set_pending()
+
     def begin_service(self, csr):
         active_period = self.get_active_period()
         active_period.time_end = datetime.now()
@@ -95,6 +120,8 @@ class ServiceReq(Base):
         )
 
         db.session.add(new_period)
+
+        self.set_active()
 
     def place_on_hold(self, csr):
         active_period = self.get_active_period()
@@ -114,7 +141,11 @@ class ServiceReq(Base):
 
         db.session.add(new_period)
 
+        self.set_active()
+
     def finish_service(self, csr):
         active_period = self.get_active_period()
         active_period.time_end = datetime.now()
         db.session.add(active_period)
+
+        self.set_complete()
