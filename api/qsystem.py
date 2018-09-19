@@ -14,6 +14,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_socketio import SocketIO
 from functools import wraps
 from sqlalchemy.exc import SQLAlchemyError
+from flask_admin import Admin
+from flask_admin.contrib.sqla import ModelView
 
 from app.exceptions import AuthError
 
@@ -52,6 +54,16 @@ api = Api(application, prefix='/api/v1', doc='/api/v1/')
 
 from app.patches.flask_oidc_patched import OpenIDConnect
 oidc = OpenIDConnect(application)
+
+from app import admin
+
+console = Admin(application, name='Admin Console', template_mode='bootstrap3')
+console.add_view(admin.ChannelModelView)
+console.add_view(admin.CSRModelView)
+console.add_view(admin.OfficeModelView)
+console.add_view(admin.RoleModelView)
+console.add_view(admin.ServiceModelView)
+console.add_view(admin.SmartBoardModelView)
 
 compress = Compress()
 compress.init_app(application)

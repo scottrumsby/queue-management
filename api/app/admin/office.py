@@ -13,17 +13,21 @@ See the License for the specific language governing permissions and
 limitations under the License.'''
 
 
+from app.models import Office
+from flask_admin.contrib.sqla import ModelView
 from qsystem import db
-from .base import Base
 
 
-class SmartBoard(Base):
+class OfficeConfig(ModelView):
+    create_modal = True
+    edit_modal = True
+    can_delete = False
+    column_list = ['office_name', 'sb', 'deleted']
+    form_create_rules = ('office_name', 'sb')
+    form_edit_rules = ('office_name', 'sb', 'deleted')
+    column_labels = {'sb': 'Smartboard'}
+    column_sortable_list = ['office_name', 'sb', 'deleted']
+    column_default_sort = 'office_name'
 
-    sb_id = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
-    sb_type = db.Column(db.String(45), nullable=False)
 
-    def __repr__(self):
-        return self.sb_type
-
-    def __init__(self, **kwargs):
-        super(SmartBoard, self).__init__(**kwargs)
+OfficeModelView = OfficeConfig(Office, db.session)
