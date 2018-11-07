@@ -15,28 +15,29 @@ limitations under the License.*/
 
 
 <template>
-<div id="header" style="top: 0px; left: 0px; width: 100%; height: 70px;">
-  <b-navbar variant="faded"
-            type="light"
-            :style="this.navbarStyle">
-    <b-navbar-brand style="padding-left: 30px; padding-top: 0px; margin-bottom:5px;">
-      <a href="#">
-        <img style="height:95%; width: 95%" src="https://www2.gov.bc.ca/assets/gov/home/bc_gov_logo_transparent.png" alt="Government of B.C." title="Government of B.C.">
-      </a>
-    </b-navbar-brand>
-    <b-navbar-brand style="padding-left: 30px; padding-top: 0px;">
-      <Login />
-    </b-navbar-brand>
-  </b-navbar>
-</div>
+  <div id="header" style="top: 0px; left: 0px; width: 100%; height: 70px;">
+    <b-navbar variant="faded"
+              type="light"
+              :style="this.navbarStyle">
+      <b-navbar-brand style="padding-left: 30px; padding-top: 0px; margin-bottom:5px;">
+        <a href="#">
+          <img style="height:95%; width: 95%" src="https://www2.gov.bc.ca/assets/gov/home/bc_gov_logo_transparent.png" alt="Government of B.C." title="Government of B.C.">
+        </a>
+      </b-navbar-brand>
+
+      <b-navbar-brand style="padding-left: 30px; padding-top: 0px;">
+       <!-- <Login></Login>-->
+      </b-navbar-brand>
+    </b-navbar>
+  </div>
 </template>
 
 <script>
-import Login from './../Login'
+//import Login from './../Login'
 
 export default {
   name: 'Header',
-  components: { Login },
+//  components: { Login },
   data() {
     return {
       navbarStyle: {
@@ -46,7 +47,8 @@ export default {
         borderBottom: '2px solid #fcba19',
         height: '100%',
         width: '100%'
-      }
+      },
+      NavText: 'TheQ System'
     }
   },
   created() {
@@ -68,7 +70,22 @@ export default {
 </script>
 
 <style>
+  #topnavigation {
+    top: 100px;
+    width:100%;
+    padding-right:2%;
+    padding-top:2%;
+    display:flex;
+    justify-content:flex-end;
+  }
   .modal-main div {
     background-color: blue;
+  }
+  .nav-switcher {
+    color: white !important;
+    border-color: white !important;
+  }
+  .nav-menu-feedback {
+    background-color: blue !important;
   }
 </style>

@@ -1,7 +1,6 @@
 
 
 <template>
-  <div id="serveModal" class="serve-modal">
     <div class="serve-modal-content">
       <b-alert :show="this.serveModalAlert != ''"
                 style="h-align: center"
@@ -20,7 +19,8 @@
                     @click="toggleMinimize">{{ minimizeWindow ? "Maximize" : "Minimize" }}</b-button>
         </div>
       </div>
-      <b-container class="pb-3" id="serve-citizen-modal-top" fluid v-if="!minimizeWindow">
+      <b-container class="pb-3" id="td-modal-top-container" fluid>
+
         <b-row no-gutters class="p-2">
           <b-col col cols="4">
             <div><h6>Ticket #: <strong>{{citizen.ticket_number}}</strong></h6></div>
@@ -77,13 +77,6 @@
                       btn-primary serve-btn"
                       @click="clickAddService"
                       :disabled="serviceBegun===false || performingAction">Add Next Service</b-button>
-            <div class="mr-1 btn-success" style="border-radius: 5px" v-if="reception">
-              <b-form-checkbox v-model="quick" value="1" unchecked-value="0"
-                               class="mt-3 ml-1 mr-1 pb-1 quick-checkbox" style="position: relative; top: -5px;">
-                <span style="font: 400 16px Myriad-Pro;">Quick Txn</span>
-                <span class="quick-span" v-if="quick"></span> <!-- For puppeteer testing to see if quick is selected -->
-              </b-form-checkbox>
-            </div>
           </b-col>
           <b-col cols="2" />
         </b-row>
@@ -120,15 +113,15 @@
         </b-container>
       </div>
     </div>
-  </div>
+
 </template>
 
 <script>
 import { mapState, mapGetters, mapActions, mapMutations } from 'vuex'
-import ServeCitizenTable from './serve-citizen-table'
+import ServeCitizenTable from './ticket-table'
 
 export default {
-  name: 'ServeCitizen',
+  name: 'TicketContent',
   components: {
     ServeCitizenTable
   },
@@ -166,13 +159,6 @@ export default {
       'serviceModalForm',
       'serveModalAlert'
     ]),
-    ...mapGetters(['invited_citizen', 'active_service', 'invited_service_reqs', 'reception']),
-    citizen() {
-      if (!this.invited_citizen) {
-        return {ticket_number: ''}
-      }
-      return this.invited_citizen
-    },
     comments: {
       get() {
         return this.serviceModalForm.citizen_comments
@@ -200,13 +186,6 @@ export default {
         return {channel_name: '', channel_id: ''}
       }
       return this.active_service.channel
-    },
-    quick: {
-      get() { return this.serviceModalForm.quick },
-      set(value) {
-        console.log(value)
-        this.editServiceModalForm({type:'quick',value})
-      }
     }
   },
 
@@ -262,6 +241,7 @@ export default {
   background-color: rgba(0,0,0,0.4);
   transition: display 1s;
 }
+#
 .serve-modal-content {
     background-color: #fefefe;
     margin-right: auto;
@@ -271,10 +251,14 @@ export default {
     padding: 20px;
     border: 1px solid #888;
     width: 80%;
+
 }
 #serve-citizen-modal-top {
   border: 1px solid grey;
   background-color: WhiteSmoke;
+}
+#td-modal-top-container {
+  border: 1px solid dimgrey !important;
 }
 #serve-citizen-footer-button {
   color: black;

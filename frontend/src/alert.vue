@@ -29,7 +29,7 @@ export default {
   name: 'Alert',
 
   computed: {
-    ...mapState([ 'alertMessage', 'dismissCount' ])
+    ...mapState([ 'alertMessage', 'countDown' ]),
   },
 
   methods: {
@@ -41,4 +41,3 @@ export default {
   }
 }
 </script>
-

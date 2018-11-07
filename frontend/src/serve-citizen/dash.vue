@@ -15,49 +15,11 @@ limitations under the License.*/
 
 <template>
   <div v-bind:style="{height: totalH}" class="dashmaincontainer" key="dashmaincontainer" v-if="user.username">
-    <div v-bind:style="{width:'100%', height:`${buttonH}px`}" v-if="isLoggedIn">
-      <AddCitizen v-if="showAddModal"/>
-      <ServeCitizen v-if="showServiceModal"/>
-      <div id="dash-flex-button-container">
-        <div>
-          <b-button class="btn-primary"
-                    @click="invite"
-                    :disabled="citizenInvited===true || performingAction || showAdmin"
-                    v-if="reception"
-                    id="invite-citizen-button">Invite</b-button>
-          <b-button v-bind:class="serveNowStyle"
-                    @click="clickServeNow"
-                    :disabled="citizenInvited===false"
-                    id="serve-citizen-button">Serve Now</b-button>
-        </div>
-        <div>
-          <b-button class="btn-primary"
-                    @click="addCitizen"
-                    :disabled="citizenInvited===true || performingAction || showAdmin"
-                    id="add-citizen-button">Add Citizen</b-button>
-          <b-button class="btn-primary"
-                    @click="clickBackOffice"
-                    :disabled="citizenInvited===true || performingAction || showAdmin"
-                    id="add-citizen-button">Back Office</b-button>
-        </div>
-        <div>
-          <b-button class="btn-primary"
-                    style="margin-right: 20px"
-                    v-if="user.role && (['ANALYTICS', 'GA', 'HELPDESK', 'SUPPORT'].indexOf(user.role.role_code) >= 0)"
-                    @click="clickAdmin"
-                    id="click-feedback-button">Toggle Admin</b-button>
-          <b-button class="btn-primary"
-                    style="margin-right: 20px"
-                    :disabled="showAdmin"
-                    @click="clickGAScreen"
-                    v-if="user.role && user.role.role_code=='GA'">Toggle GA Panel</b-button>
-          <b-button class="btn-primary"
-                    v-if="!showServiceModal"
-                    @click="clickFeedback"
-                    id="click-feedback-button">Feedback</b-button>
-        </div>
-      </div>
+    <div v-bind:style="{width:'100%', height:`${buttonH}px`}">
+      <DashButtons />
     </div>
+    <AddCitizen v-if="showAddModal"/>
+    <ServeCitizen v-if="showServiceModal"/>
     <div style="display: flex; flex-direction: row; justify-content: space-between;" v-if="!showAdmin">
       <div style="width: 100%">
         <template v-if="reception && isLoggedIn">
@@ -112,11 +74,13 @@ import DashTable from './dash-table'
 import DashHoldTable from './dash-hold-table'
 import GAScreen from './../ga-screen/ga-screen'
 import ServeCitizen from './serve-citizen'
+import DashButtons from './dash-buttons'
 
   export default {
     name: 'Dash',
 
     components: {
+      DashButtons,
       AddCitizen,
       DashTable,
       DashHoldTable,
@@ -283,9 +247,6 @@ import ServeCitizen from './serve-citizen'
     padding-right: 1%;
     padding-top: 8px;
     padding-bottom: 8px;
-  }
-  #dash-flex-button-container {
-    display: flex; justify-content: space-between; height: 100% !important;
   }
   .dash-table-holder {
     overflow-y: scroll; overflow: scroll; border: 1px solid dimgrey;
