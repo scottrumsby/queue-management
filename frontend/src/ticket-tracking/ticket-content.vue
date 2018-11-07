@@ -1,7 +1,6 @@
 
 
 <template>
-  <div id="serveModal" class="serve-modal">
     <div class="serve-modal-content">
       <b-alert :show="this.serveModalAlert != ''"
                 style="h-align: center"
@@ -20,7 +19,8 @@
                     @click="toggleMinimize">{{ minimizeWindow ? "Maximize" : "Minimize" }}</b-button>
         </div>
       </div>
-      <b-container class="pb-3" id="serve-citizen-modal-top" fluid v-if="!minimizeWindow">
+      <b-container class="pb-3" id="td-modal-top-container" fluid>
+
         <b-row no-gutters class="p-2">
           <b-col col cols="4">
             <div><h6>Ticket #: <strong>{{citizen.ticket_number}}</strong></h6></div>
@@ -113,15 +113,15 @@
         </b-container>
       </div>
     </div>
-  </div>
+
 </template>
 
 <script>
 import { mapState, mapGetters, mapActions, mapMutations } from 'vuex'
-import ServeCitizenTable from './serve-citizen-table'
+import ServeCitizenTable from './ticket-table'
 
 export default {
-  name: 'ServeCitizen',
+  name: 'TicketContent',
   components: {
     ServeCitizenTable
   },
@@ -159,13 +159,6 @@ export default {
       'serviceModalForm',
       'serveModalAlert'
     ]),
-    ...mapGetters(['invited_citizen', 'active_service', 'invited_service_reqs', 'reception']),
-    citizen() {
-      if (!this.invited_citizen) {
-        return {ticket_number: ''}
-      }
-      return this.invited_citizen
-    },
     comments: {
       get() {
         return this.serviceModalForm.citizen_comments
@@ -248,6 +241,7 @@ export default {
   background-color: rgba(0,0,0,0.4);
   transition: display 1s;
 }
+#
 .serve-modal-content {
     background-color: #fefefe;
     margin-right: auto;
@@ -257,10 +251,14 @@ export default {
     padding: 20px;
     border: 1px solid #888;
     width: 80%;
+
 }
 #serve-citizen-modal-top {
   border: 1px solid grey;
   background-color: WhiteSmoke;
+}
+#td-modal-top-container {
+  border: 1px solid dimgrey !important;
 }
 #serve-citizen-footer-button {
   color: black;

@@ -16,14 +16,14 @@ limitations under the License.*/
 
 <template>
   <b-col id="login-form">
-    <div v-show="!this.$store.state.isLoggedIn">
+    <div v-show="1===2">
       <b-button @click="login()"
                 id="login-button"
                 style="padding-top: 10px"
                 class="btn btn-primary">Login</b-button>
     </div>
 
-    <div v-show="this.$store.state.isLoggedIn"
+    <div v-show="1===1"
          style="display: flex; flex-direction: row; justify-content: space-between">
       <div style="padding-right: 20px" v-if="reception">
         <b-form-checkbox :checked="quick_trans_status"
@@ -31,11 +31,11 @@ limitations under the License.*/
                          class="navbar-label">Quick Txn</b-form-checkbox>
       </div>
       <div style="padding-right: 20px">
-        <label class="navbar-label navbar-user">User: {{ this.$store.state.user.username }}</label>
-        <label class="navbar-label">Office: {{ this.$store.state.user.office.office_name }}</label>
+        <label class="navbar-label navbar-user">User: Test User</label>
+        <label class="navbar-label">Office: Vernon</label>
       </div>
       <div style="padding-top: 5px">
-        <b-button v-show="this.$store.state.isLoggedIn"
+        <b-button v-show="1===1"
                   @click="logout()"
                   id="logout-button"
                   class="btn btn-primary">Logout</b-button>

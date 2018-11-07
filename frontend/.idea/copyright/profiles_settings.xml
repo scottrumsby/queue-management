@@ -1,0 +1,12 @@
+<component name="CopyrightManager">
+  <settings>
+    <module2copyright>
+      <element module="Scratches and Consoles" copyright="none" />
+      <element module="Project Files" copyright="BC Gov" />
+    </module2copyright>
+    <LanguageOptions name="Vue.js">
+      <option name="fileTypeOverride" value="3" />
+      <option name="prefixLines" value="false" />
+    </LanguageOptions>
+  </settings>
+</component>
