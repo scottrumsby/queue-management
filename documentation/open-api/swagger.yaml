@@ -266,6 +266,12 @@ components:
         room_id:
           type: integer
           example: 1
+        fees:
+          type: boolean
+          example: false
+        booking_bame:
+          type: string
+          example: Monthly Office Check In
         exam:
           readOnly: true
           allOf:
