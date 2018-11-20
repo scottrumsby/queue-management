@@ -267,9 +267,9 @@ components:
           type: integer
           example: 1
         fees:
-          type: boolean
+          type: string
           example: false
-        booking_bame:
+        booking_name:
           type: string
           example: Monthly Office Check In
         exam:
@@ -350,6 +350,20 @@ components:
         name:
           type: string
           example: ITA Exam Type
+        color:
+          type: string
+          example: red
+        num_hours:
+          type: int
+          example: 3
+        method_type:
+          type: string
+          enum:
+          - group
+          - individual
+        ita_ind:
+          type: boolean
+          example: false
     Invigilator:
       type: object
       properties:
@@ -405,6 +419,9 @@ components:
         capacity:
           type: integer
           example: 12
+        color:
+          type: string
+          example: red
         office:
           $ref: "#/components/schemas/Office"
 
