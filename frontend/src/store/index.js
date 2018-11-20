@@ -267,7 +267,8 @@ export const store = new Vuex.Store({
       service:'',
       quick: 0,
       suspendFilter: false,
-      selectedItem: ''
+      selectedItem: '',
+      priority: 2
     },
     addModalSetup: null,
     alertMessage: '',
@@ -294,7 +295,8 @@ export const store = new Vuex.Store({
       citizen_comments: '',
       activeQuantity: 1,
       accurate_time_ind: 1,
-      quick: 0
+      quick: 0,
+      priority: 2
     },
     services: [],
     showAddModal: false,
@@ -614,6 +616,10 @@ export const store = new Vuex.Store({
             type: 'quick',
             value: context.getters.invited_citizen.qt_xn_citizen_ind
           })
+          context.commit('updateAddModalForm', {
+            type: 'priority',
+            value: context.getters.invited_citizen.priority
+          })
           context.commit('toggleAddModal', true)
           context.commit('toggleServiceModal', false)
         })
@@ -709,12 +715,13 @@ export const store = new Vuex.Store({
         context.dispatch('getServices')
       }
       context.dispatch('putServiceRequest').then(() => {
-        context.dispatch('putCitizen').then(() => {
-          context.commit('switchAddModalMode', 'edit_mode')
-          context.dispatch('setAddModalData')
-          context.commit('toggleAddModal', true)
-          context.commit('toggleServiceModal', false)
-        })
+        context.commit('switchAddModalMode', 'edit_mode')
+        context.dispatch('setAddModalData')
+        context.commit('toggleAddModal', true)
+        context.commit('toggleServiceModal', false)
+        context.commit('setPerformingAction', false)
+      }).catch(() => {
+        context.commit('setPerformingAction', false)
       })
     },
 
@@ -889,7 +896,7 @@ export const store = new Vuex.Store({
       context.commit('toggleGAScreenModal', false)
     },
 
-    messageFeedback(context) {
+      messageFeedback(context) {
       let messageParts = []
       messageParts.push(`Username: ${context.state.user.username}`)
       messageParts.push(`Office: ${context.state.user.office.office_name}`)
@@ -1021,11 +1028,13 @@ export const store = new Vuex.Store({
     postServiceReq(context) {
       let { form_data } = context.getters
       let { citizen_id } = form_data.citizen
+      let { priority } = form_data.priority
       let service_request = {
         service_id: form_data.service,
         citizen_id: citizen_id,
         quantity: 1,
-        channel_id: form_data.channel
+        channel_id: form_data.channel,
+        priority: priority
       }
 
       return new Promise((resolve, reject) => {
@@ -1042,9 +1051,12 @@ export const store = new Vuex.Store({
       let data = {}
       let citizen_id
       let quick
+      let priority
 
       if (context.state.serviceModalForm.citizen_id) {
-        let { accurate_time_ind, citizen_comments, quick } = context.state.serviceModalForm
+        let { accurate_time_ind, citizen_comments } = context.state.serviceModalForm
+        quick = context.state.serviceModalForm.quick
+        priority = context.state.serviceModalForm.priority
         citizen_id = context.state.serviceModalForm.citizen_id
         let prevCitizen = context.getters.invited_citizen
 
@@ -1058,8 +1070,11 @@ export const store = new Vuex.Store({
           if ( citizen_comments !== prevCitizen.citizen_comments ) {
             data.citizen_comments = citizen_comments
           }
-          if ( quick !== prevCitizen.quick ) {
+          if ( quick !== prevCitizen.qt_xn_citizen_ind ) {
             data.qt_xn_citizen_ind = quick
+          }
+          if ( priority !== prevCitizen.priority ) {
+            data.priority = priority
           }
           if ( accurate_time_ind != null && accurate_time_ind !== prevCitizen.accurate_time_ind ) {
             data.accurate_time_ind = accurate_time_ind
@@ -1072,6 +1087,7 @@ export const store = new Vuex.Store({
         if (!form_data.quick) {
           data.qt_xn_citizen_ind = 0
         }
+        data.priority = form_data.priority
         data.citizen_comments = form_data.comments
       }
 
@@ -1223,7 +1239,7 @@ export const store = new Vuex.Store({
     },
 
     //Updates the counter's type from the state after selecting from the dropdown (regular counter, quick transaction, or receptionist)
-    updateCSRState(context) {
+      updateCSRState(context) {
       let csr_id = context.state.user.csr_id
       Axios(context).put(`/csrs/${csr_id}/`, {
         qt_xn_csr_ind: context.state.user.qt_xn_csr_ind,
@@ -1285,6 +1301,11 @@ export const store = new Vuex.Store({
           key,
           0
         )
+        if ( key === 'priority' ) Vue.set(
+          state.addModalForm,
+          key,
+          2
+        )
         if ( key === 'suspendFilter' ) Vue.set(
           state.addModalForm,
           key,
@@ -1303,6 +1324,7 @@ export const store = new Vuex.Store({
       let formData = {
         comments: citizen.citizen_comments,
         quick: citizen.qt_xn_citizen_ind,
+        priority: citizen.priority,
         citizen: citizen,
         channel: active_service.channel_id,
         service: active_service.service_id
@@ -1324,8 +1346,9 @@ export const store = new Vuex.Store({
       let { citizen_id } = citizen
       let service_citizen = citizen
       let quick = citizen.qt_xn_citizen_ind
+      let priority = citizen.priority
 
-      let obj = { citizen_comments, activeQuantity, citizen_id, service_citizen, quick }
+      let obj = { citizen_comments, activeQuantity, citizen_id, service_citizen, quick, priority }
       let keys = Object.keys(obj)
 
       keys.forEach(key => {
