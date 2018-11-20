@@ -4,7 +4,6 @@
     size="lg"
     :hide-cancel="true"
     :hide-ok="true"
-    @hide="hideExamEdit"
     modal-class="custom-base-modal"
     body-class="custom-base-modal-body"
     header-class="custom-base-modal-headerlg"

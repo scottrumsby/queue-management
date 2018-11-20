@@ -37,8 +37,10 @@
 </template>
 
 <script>
+  import { mapState, mapMutations, mapGetters, mapActions } from 'vuex'
+
   export default {
-    name: "DashButtons"
+    name: "DashButtons",
     computed: {
       ...mapGetters(['reception']),
       ...mapState([
@@ -59,7 +61,7 @@
     methods: {
       ...mapMutations([
         'setMainAlert',
-        'toggleFeedbackModal' +
+        'toggleFeedbackModal'
         ]),
       ...mapActions([
         'clickInvite',
