@@ -24,20 +24,20 @@ limitations under the License.*/
           <img style="height:95%; width: 95%" src="https://www2.gov.bc.ca/assets/gov/home/bc_gov_logo_transparent.png" alt="Government of B.C." title="Government of B.C.">
         </a>
       </b-navbar-brand>
-
       <b-navbar-brand style="padding-left: 30px; padding-top: 0px;">
-       <!-- <Login></Login>-->
+        <Login />
       </b-navbar-brand>
     </b-navbar>
   </div>
 </template>
 
+
 <script>
-//import Login from './../Login'
+import Login from './../Login'
 
 export default {
   name: 'Header',
-//  components: { Login },
+  components: { Login },
   data() {
     return {
       navbarStyle: {

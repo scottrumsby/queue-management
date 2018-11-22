@@ -1,6 +1,6 @@
 <template>
   <b-modal
-    :visible="true"
+    v-model="modalVisible"
     size="lg"
     :hide-cancel="true"
     :hide-ok="true"
@@ -24,7 +24,7 @@
 
         <b-form-row class="mb-2 mt-0 pt-0"><!-- 2. Type / Event ID -->
           <b-col>
-            <label class="m-0">Exam Type</label>
+            <label class="m-0">Exam Typlwe</label>
             <b-form-input id="type"
                           class="green"
                           @input.native="handleInput"
@@ -152,8 +152,6 @@
 
 <script>
   import { mapState, mapMutations } from 'vuex'
-  import Scheduler from './../room-booking/scheduler'
-  import Invigilators from '@/room-booking/invigilators'
   import datePicker from 'vue-bootstrap-datetimepicker'
   import 'pc-bootstrap4-datetimepicker/build/css/bootstrap-datetimepicker.css'
 
@@ -163,7 +161,7 @@
 
   export default {
     name: 'EditExam',
-    components: { datePicker, Scheduler, Invigilators },
+    components: { datePicker },
 
     data() {
       return {
@@ -194,7 +192,15 @@
     },
 
     computed: {
-      ...mapState(['scheduleDisplay', 'editedExam', 'showExamEditModal']),
+      ...mapState(['scheduleDisplay', 'editedExam', 'editExamModalVisible']),
+      modalVisible: {
+        get() {
+          return this.editExamModalVisible
+        },
+        set(v) {
+          this.toggleEditExamModal(v)
+        }
+      },
       formVisible() {
         if (this.type === 'Please select') return false
         return true

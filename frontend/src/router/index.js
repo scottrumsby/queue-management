@@ -1,47 +1,46 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Inventory from '@/exams/inventory'
-import Scheduler from '@/room-booking/scheduler'
-import Calendar from '@/room-booking/calendar'
-import Confirm from '@/room-booking/confirm'
-import Dash from '@/serve-citizen/dash'
-import Nav from '@/layout/nav'
-import InventoryModal from '@/exams/inventory-modal'
+import InventoryButtons from '../exams/inventory-buttons'
+import Inventory from '../exams/inventory'
+import App from '../App'
+import Smartboard from '../smartboard/index'
+import Calendar from '../room-booking/calendar'
+import ButtonsCalendar from '../room-booking/buttons-calendar'
+import Dash from '../serve-citizen/dash'
+import DashButtons from '../serve-citizen/dash-buttons'
 
 Vue.use(Router)
-
-
-const MainContent = {
-  template: `
-    <div>
-      I'm the not main content
-      <router-link to="/path">Path</router-link>
-    </div>
-  `
-}
-
-
-
-
 
 export default new Router({
   routes: [
     {
-      path:'/cal',
-      component: Calendar,
+      path: '/',
+      component: App,
+    },
+   /* {
+      path: 'cal',
+      components: {
+        default: Calendar,
+        buttons: ButtonsCalendar
+      }
     },
     {
-      path:'/dash',
-      component: Dash,
+      path: 'exams',
+      components: {
+        default: Inventory,
+        buttons: InventoryButtons
+      }
     },
     {
-      path:'/exams',
-      component: Inventory,
+        path: 'dash',
+        components: {
+          default: Dash,
+          buttons: DashButtons
+        }
     },
     {
-      path:'/',
-      component: MainContent,
-    },
-
-  ]
+      path: '/smartboard',
+      component: Smartboard
+    }*/
+    ]
 })

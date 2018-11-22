@@ -27,12 +27,9 @@ Vue.use(Vuex)
 
 export const store = new Vuex.Store({
   state: {
+    examTypes: plug.examTypes,
     calendarScheduleMode: false,
-    resources: [
-      { id: 'room1', title: 'Boardroom 1', eventColor: '#b2cdea' },
-      { id: 'room2', title: 'Boardroom 2', eventColor: '#c7ebc5' },
-      { id: 'room3', title: 'Office 6', eventColor: '#f0c0b5' }
-    ],
+    resources: plug.resources,
     eventsSource: {
       events: plug.events,
     },
@@ -41,8 +38,7 @@ export const store = new Vuex.Store({
     navigationVisible: true,
     bookRoomModalVisible: false,
     inventoryModalVisible: false,
-    examCaptureVisible: false,
-    invigilatorsModalVisible: false,
+    invigilatorModalVisible: false,
     ticketModal: {
       visible: false,
       minimized: false,
@@ -135,9 +131,8 @@ export const store = new Vuex.Store({
       office_id: null,
       qt_xn_csr_ind: true,
       receptionist_ind: null,
-      checkComplete: false,
-      userLoadingFail: false,
     },
+    userLoadingFail: false,
   },
 
   getters: {
@@ -1322,6 +1317,8 @@ export const store = new Vuex.Store({
     setCalendarView: (state, payload) => state.calendarView = payload,
 
     toggleCalendarScheduleMode: (state, payload) => state.calendarScheduleMode = payload,
+
+    toggleConfirmModal: (state, payload) => state.confirmModalVisible = payload,
 
   }
 })

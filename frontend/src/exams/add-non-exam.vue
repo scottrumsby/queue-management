@@ -1,5 +1,5 @@
 <template>
-  <b-modal :visible="true"
+  <b-modal v-model="modalVisible"
            size="lg"
            :hide-ok="true"
            :hide-cancel="true"
@@ -93,7 +93,7 @@
 </template>
 
 <script>
-  import { mapMutations } from 'vuex'
+  import { mapMutations, mapState } from 'vuex'
   import datePicker from 'vue-bootstrap-datetimepicker'
   import 'pc-bootstrap4-datetimepicker/build/css/bootstrap-datetimepicker.css'
 
@@ -120,6 +120,17 @@
         ],
         type: '',
         known: '',
+      }
+    },
+    computed: {
+      ...mapState(['addNonExamModalVisible']),
+      modalVisible: {
+        get() {
+          return this.addNonExamModalVisible
+        },
+        set(v) {
+          this.toggleNonExamModal(v)
+        }
       }
     },
     methods: {

@@ -1,5 +1,5 @@
 <template>
-  <b-modal :visible="true"
+  <b-modal v-model="modalVisible"
            @hidden="close"
            size="lg"
            :hide-ok="true"
@@ -55,7 +55,15 @@ import { mapState, mapMutations } from 'vuex'
       }
     },
     computed: {
-      ...mapState(['invigilators']),
+      ...mapState(['invigilators','invigilatorModalVisible']),
+      modalVisible: {
+        get() {
+          return this.invigilatorModalVisible
+        },
+        set(v) {
+          this.toggleInvigilatorModal(v)
+        }
+      }
     },
     methods: {
       ...mapMutations(['toggleInvigilatorModal']),

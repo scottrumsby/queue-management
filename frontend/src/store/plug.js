@@ -178,3 +178,26 @@ export const events = [
       resourceId: 'room2'
     },
   ]
+
+export const examTypes = [
+  {text: 'Heading Yellow', class:'header', class2:'p-0 pt-2 pl-1 yellow'},
+  {text: 'ODSC 1 SINGLE-3HR+1HR-READER OWN', class:'yellow txt-85', cat:'single'},
+  {text: 'ODSC 2 SINGLE-3HR NONE', class:'pt-0 yellow'},
+  {text: 'ODSC 3 SINGLE-3HR+1HR-READER SBC', class:'pt-0 yellow'},
+  {text: 'ODSC 4 GROUP-3HR+1HR-READER SBC ', class:'pt-0 yellow', cat:'group'},
+
+  {text: 'Heading Green', class:'header', class2:'p-0 mt-1 pt-1 pl-1 green txt-85'},
+  {text: 'CWERC 1 SINGLE-3HR+1HR-READER SBC', class:'pt-0 green'},
+  {text: 'CWERC 2 SINGLE-3HR NONE', class:'pt-0 green'},
+
+  {text: 'Heading Pink', class:'header', class2:'p-0 mt-1 pt-1 pl-1 purple txt-85'},
+  {text: 'CWERC 3 SINGLE-3HR+1HR-READER SBC', class:'pt-0 purple'},
+  {text: 'GTI 1 GROUP-3HR+1HR-TRANS', class:'pt-0 purple'},
+  {text: 'GTI 2 GROUP-3HR+2HR-SBC IVN', class:'pt-0 purple'},
+]
+
+export const resources = [
+  { id: 'room1', title: 'Boardroom 1', eventColor: '#b2cdea' },
+  { id: 'room2', title: 'Boardroom 2', eventColor: '#c7ebc5' },
+  { id: 'room3', title: 'Office 6', eventColor: '#f0c0b5' }
+]

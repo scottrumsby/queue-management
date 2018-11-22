@@ -1,5 +1,5 @@
 <template>
-  <div class="inv-dimmer">
+  <div class="inv-dimmer" v-if="inventoryModalVisible">
     <div class="inv-content">
       <div class="header">
         <h5>Click on a row to select an Exam</h5>
@@ -19,11 +19,14 @@
 
 <script>
   import InventoryTable from './inventory-table'
-  import { mapMutations } from 'vuex'
+  import { mapMutations, mapState } from 'vuex'
 
   export default {
     name: 'InventoryModal',
     components: { InventoryTable },
+    computed: {
+      ...mapState(['inventoryModalVisible']),
+    },
     methods: {
       ...mapMutations(['toggleInventoryModal']),
       clickCancel() {

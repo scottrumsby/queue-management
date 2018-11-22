@@ -1,24 +1,5 @@
 <template>
-  <Nav class="mr-3 pr-1">
-
-    <template slot="top-buttons">
-      <ButtonsScheduler v-if="calendarScheduleMode"
-                        :today="today"
-                        :next="next"
-                        :prev="prev"
-                        :agendaWeek="agendaWeek"
-                        :agendaDay="agendaDay"
-                        :listWeek="listWeek"
-                        :month="month"/>
-      <ButtonsCalendar v-else
-                       :today="today"
-                       :next="next"
-                       :prev="prev"
-                       :listWeek="listWeek"
-                       :listDay="listDay"
-                       :month="month"/>
-    </template>
-    <template slot="content">
+  <div>
       <div class="title inline-title">{{ title }}</div>
       <div class="inline-title">Legend:</div>
       <div class="inline-title legend"
@@ -33,9 +14,7 @@
                        :events="eventsSource"
                        :config="configuration"></full-calendar>
 
-    </template>
-
-  </Nav>
+  </div>
 </template>
 
 <script>

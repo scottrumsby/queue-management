@@ -4,7 +4,7 @@
 
 
         <!-- SLOT FOR EACH VIEW'S BUTTON CONTROLS-->
-        <slot name="top-buttons"></slot>
+      <router-view name="buttons"/>
 
 
       <div class="add-flex-grow ml-3" v-if="navigationVisible">
@@ -37,7 +37,7 @@
     </div>
 
     <!--SLOT FOR EACH VIEW'S MAIN CONTENT-->
-    <slot name="content"></slot>
+    <router-view />
 
   </div>
 </template>
@@ -96,7 +96,6 @@ import TicketModal from '@/ticket-tracking/ticket-modal'
 
 .add-flex-grow {
   flex-grow: 1;
-  background-color: yellow;
 }
 
 </style>

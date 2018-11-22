@@ -14,7 +14,7 @@ limitations under the License.*/
 
 <template>
   <div style="top: 0px; left: 0px;">
-  <b-alert :show="dismissCount"
+  <b-alert :show="countDown"
            dismissible
            style="h-align: center; font-size:1rem; border-radius: 0px;"
            variant="warning"

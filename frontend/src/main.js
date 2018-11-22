@@ -57,9 +57,8 @@ import router from './router'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import './assets/css/bc-gov-style.css'
-
 require('es6-shim')
-//require('Keycloak')
+require('Keycloak')
 
 Vue.use(VDragged)
 Vue.use(BootstrapVue)
@@ -95,15 +94,36 @@ library.add(
 )
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 
-//var keycloak = Keycloak(process.env.KEYCLOAK_JSON_URL)
-//Vue.prototype.$keycloak = keycloak
+var keycloak = Keycloak(process.env.KEYCLOAK_JSON_URL)
+Vue.prototype.$keycloak = keycloak
 Vue.config.productionTip = false
 
+const routes = {
+  '/': App,
+  'smartboard': Smartboard
+}
+
 /* eslint-disable no-new */
-new Vue({
+const app = new Vue({
   el: '#app',
   store,
-  router,
-  template: '<App />',
-  components: { App },
+  components: { App, Smartboard },
+  computed: {
+    currentRoute() {
+      let path = window.location.pathname
+      let pathspl = path.split('/')
+      if ( path === '/') {
+        return '/'
+      } else if (pathspl.length >= 2) {
+        return pathspl[1]
+      } else {
+        return '/'
+      }
+    },
+    ViewComponent () {
+      return routes[this.currentRoute]
+    }
+  },
+
+  render (h) { return h(this.ViewComponent) }
 })

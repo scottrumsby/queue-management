@@ -15,28 +15,28 @@ limitations under the License.*/
 
 <template>
   <b-col id="login-form">
-    <div v-show="1===2">
+    <div v-show="!this.$store.state.isLoggedIn">
       <b-button @click="login()"
                 id="login-button"
                 style="padding-top: 10px"
                 class="btn btn-primary">Login</b-button>
     </div>
 
-    <div v-show="1===1"
+    <div v-show="this.$store.state.isLoggedIn"
          style="display: flex; flex-direction: row; justify-content: space-between">
       <div id="select-wrapper" style="padding-right: 20px" v-if="reception">
-         <select id="counter-selection" class="custom-select" v-model="counter_selection">
-           <option value='counter'>Counter</option>
-           <option value='quick'>Quick Trans</option>
-           <option value='receptionist'>Receptionist</option>
+        <select id="counter-selection" class="custom-select" v-model="counter_selection">
+          <option value='counter'>Counter</option>
+          <option value='quick'>Quick Trans</option>
+          <option value='receptionist'>Receptionist</option>
         </select>
       </div>
       <div style="padding-right: 20px">
-        <label class="navbar-label navbar-user">User: Test User</label>
-        <label class="navbar-label">Office: Vernon</label>
+        <label class="navbar-label navbar-user">User: {{ this.$store.state.user.username }}</label>
+        <label class="navbar-label">Office: {{ this.$store.state.user.office.office_name }}</label>
       </div>
       <div style="padding-top: 5px">
-        <b-button v-show="1===1"
+        <b-button v-show="this.$store.state.isLoggedIn"
                   @click="logout()"
                   id="logout-button"
                   class="btn btn-primary">Logout</b-button>
@@ -46,9 +46,8 @@ limitations under the License.*/
 </template>
 
 <script>
-import _ from 'lodash'
-import { mapActions, mapGetters, mapMutations } from 'vuex'
-
+  import _ from 'lodash'
+  import { mapActions, mapGetters, mapMutations } from 'vuex'
   export default {
     name: 'Login',
     created() {
@@ -84,22 +83,21 @@ import { mapActions, mapGetters, mapMutations } from 'vuex'
           let timeUntilExp = Math.round(tokenExp - new Date().getTime() / 1000)
           if (timeUntilExp > 30) {
             this.$keycloak.init({
-                responseMode: 'fragment',
-                flow: 'standard',
-                refreshToken: localStorage.refreshToken,
-                token: localStorage.token,
-                tokenExp: localStorage.tokenExp
+              responseMode: 'fragment',
+              flow: 'standard',
+              refreshToken: localStorage.refreshToken,
+              token: localStorage.token,
+              tokenExp: localStorage.tokenExp
             })
-            .success( () => {
-
-              //Set a timer to auto-refresh the token
-              setInterval(() => { this.refreshToken(300); }, 60*1000)
-              this.setTokenToLocalStorage()
-              this.$store.commit('setBearer', localStorage.token)
-            })
-            .error( () => {
-              this.init()
-            })
+              .success( () => {
+                //Set a timer to auto-refresh the token
+                setInterval(() => { this.refreshToken(300); }, 60*1000)
+                this.setTokenToLocalStorage()
+                this.$store.commit('setBearer', localStorage.token)
+              })
+              .error( () => {
+                this.init()
+              })
           } else {
             this.init()
           }
@@ -107,7 +105,6 @@ import { mapActions, mapGetters, mapMutations } from 'vuex'
           this.init()
         }
       },
-
       init() {
         this.$keycloak.init({
             responseMode: 'fragment',
@@ -117,33 +114,27 @@ import { mapActions, mapGetters, mapMutations } from 'vuex'
           setInterval(() => { this.refreshToken(300); }, 60*1000)
         })
       },
-
       setupKeycloakCallbacks(authenticated) {
-
         this.$keycloak.onAuthSuccess = () => {
           this.$store.dispatch('logIn', this.$keycloak.token)
           this.setTokenToLocalStorage()
           this.$root.$emit('socketConnect')
         }
-
         this.$keycloak.onAuthLogout = () => {
           this.$root.$emit('socketDisconnect')
           this.$store.commit('setBearer', null)
           this.$store.commit('logOut')
         }
-
         this.$keycloak.onAuthRefreshSuccess = () => {
           this.setTokenToLocalStorage()
           this.$store.commit('setBearer', this.$keycloak.token)
         }
       },
-
       setTokenToLocalStorage() {
         let tokenParsed = this.$keycloak.tokenParsed
         let token = this.$keycloak.token
         let refreshToken = this.$keycloak.refreshToken
         let tokenExpiry = tokenParsed.exp
-
         if (localStorage.token) {
           localStorage.removeItem("token")
           localStorage.removeItem("tokenExp")
@@ -154,18 +145,15 @@ import { mapActions, mapGetters, mapMutations } from 'vuex'
         localStorage.setItem("tokenExp", tokenExpiry)
         localStorage.setItem("refreshToken", refreshToken)
       },
-
       login() {
         this.$keycloak.login({idpHint: 'idir'})
       },
-
       logout() {
         this.$keycloak.logout()
         localStorage.removeItem("token")
         localStorage.removeItem("tokenExp")
         localStorage.removeItem("refreshToken")
       },
-
       refreshToken(minValidity) {
         this.$keycloak.updateToken(minValidity).success(refreshed => {
           if (refreshed) {
@@ -177,7 +165,6 @@ import { mapActions, mapGetters, mapMutations } from 'vuex'
           output('Failed to refresh token')
         })
       },
-
       updateTransactionStatus(e) {
         this.setQuickTransactionState(e)
         this.updateCSRState()
@@ -187,18 +174,16 @@ import { mapActions, mapGetters, mapMutations } from 'vuex'
 </script>
 
 <style>
-.custom-control-label::after, .custom-control-label::before {
-  top: 3px;
-}
-
-.navbar-label {
-  color: white;
-  margin-bottom: 0px;
-  float: left;
-  clear: both;
-}
-
-.navbar-brand {
-  font-size: .85rem;
-}
+  .custom-control-label::after, .custom-control-label::before {
+    top: 3px;
+  }
+  .navbar-label {
+    color: white;
+    margin-bottom: 0px;
+    float: left;
+    clear: both;
+  }
+  .navbar-brand {
+    font-size: .85rem;
+  }
 </style>

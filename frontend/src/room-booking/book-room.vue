@@ -1,6 +1,6 @@
 <template>
   <b-modal
-    :visible="true"
+    v-model="modalVisible"
     modal-class="custom-base-modal"
     body-class="custom-base-modal-body"
     header-class="custom-base-modal-headermd"
@@ -70,10 +70,18 @@ import { mapState, mapMutations } from 'vuex'
       }
     },
     computed: {
-      ...mapState(['showBookingConfirmModal']),
+      ...mapState(['bookRoomModalVisible']),
+      modalVisible: {
+        get() {
+          return this.bookRoomModalVisible
+        },
+        set(v) {
+          this.toggleBookRoomModal(v)
+        }
+      }
     },
     methods: {
-      ...mapMutations(['showBookingConfirm','hideBookingConfirm'])
+      ...mapMutations(['toggleBookRoomModal'])
     }
   }
 </script>

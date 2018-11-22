@@ -131,7 +131,6 @@ import { mapState, mapMutations } from 'vuex'
     name: 'Confirm',
     data() {
       return {
-        modalVisible: true,
         format: [
           {value: 'online', text: 'online'},
           {value: 'paper', text: 'paper'}
@@ -158,10 +157,18 @@ import { mapState, mapMutations } from 'vuex'
       }
     },
     computed: {
-      ...mapState(['showBookingConfirmModal','editedExam']),
+      ...mapState(['confirmModalVisible','editedExam']),
+      modalVisible: {
+        get() {
+          return this.confirmModalVisible
+        },
+        set(v) {
+          this.toggleConfirmModal(v)
+        }
+      }
     },
     methods: {
-      ...mapMutations(['showBookingConfirm','hideBookingConfirm'])
+      ...mapMutations(['toggleConfirmModal'])
     }
   }
 </script>

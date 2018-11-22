@@ -4,6 +4,7 @@
       <b-button class="btn-primary"
                 @click="invite"
                 :disabled="citizenInvited===true || performingAction || showAdmin"
+                v-if="reception"
                 id="invite-citizen-button">Invite</b-button>
       <b-button v-bind:class="serveNowStyle"
                 @click="clickServeNow"
@@ -23,13 +24,16 @@
     <div>
       <b-button class="btn-primary"
                 style="margin-right: 20px"
+                v-if="user.role && (['ANALYTICS', 'GA', 'HELPDESK', 'SUPPORT'].indexOf(user.role.role_code) >= 0)"
                 @click="clickAdmin"
                 id="click-feedback-button">Toggle Admin</b-button>
       <b-button class="btn-primary"
                 style="margin-right: 20px"
                 :disabled="showAdmin"
-                @click="clickGAScreen" v-if="user.role && user.role.role_code=='GA'">Toggle GA Panel</b-button>
+                @click="clickGAScreen"
+                v-if="user.role && user.role.role_code=='GA'">Toggle GA Panel</b-button>
       <b-button class="btn-primary"
+                v-if="!showServiceModal"
                 @click="clickFeedback"
                 id="click-feedback-button">Feedback</b-button>
     </div>

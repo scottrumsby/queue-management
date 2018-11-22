@@ -1,6 +1,6 @@
 <template>
   <div>
-    <form inline>
+    <form inline v-if="calendarScheduleMode">
       <b-btn-group class="btn-primary">
         <b-button class="btn-primary" @click="prev" >
           <font-awesome-icon icon="angle-left"
@@ -31,6 +31,40 @@
         </b-dropdown-item>
       </b-dropdown>
     </form>
+    <form inline v-else>
+      <b-btn-group class="btn-primary">
+        <b-button class="btn-primary"  >
+          <font-awesome-icon icon="angle-left"
+                             class="m-0 p-0"
+                             style="font-size: 1.25rem;"/>
+        </b-button>
+        <b-button class="btn-primary" >
+          <font-awesome-icon icon="angle-right"
+                             class="m-0 p-0"
+                             style="font-size: 1.25rem;"/>
+        </b-button>
+      </b-btn-group>
+
+      <b-button class="btn-primary" >Today</b-button>
+
+      <b-dropdown variant="primary" class="mr-3" text="Calendar View">
+        <b-dropdown-item-button>
+          Agenda Day
+        </b-dropdown-item-button>
+        <b-dropdown-item-button >
+          Agenda Week
+        </b-dropdown-item-button>
+        <b-dropdown-item >
+          Agenda Month
+        </b-dropdown-item>
+      </b-dropdown>
+      <b-button class="btn-danger ml-3" @click="cancel">
+        <font-awesome-icon icon="times"
+                           class="m-0 p-0"
+                           style="font-size: 1.25rem;"/>
+        Cancel Scheduling Exam
+      </b-button>
+    </form>
   </div>
 
 
@@ -43,7 +77,10 @@ export default {
   name: 'ButtonsCalendar',
   props: ['listWeek', 'listDay', 'month', 'today', 'next', 'prev'],
   computed: {
-    ...mapState(['calendarView'])
+    ...mapState([
+      'calendarView',
+      'calendarScheduleMode'
+    ])
   },
   methods: {
     ...mapMutations([
@@ -51,7 +88,8 @@ export default {
       'toggleInventoryModal',
       'toggleBookRoomModal',
       'toggleCalendarScheduleMode',
-      'toggleNavigation'
+      'toggleNavigation',
+      'toggleCalendarScheduleMode',
     ]),
     addExamEvent() {
       this.toggleInventoryModal(true)
@@ -63,6 +101,11 @@ export default {
       this.toggleNavigation(false)
       this.toggleCalendarScheduleMode(true)
       this.$root.$emit('month')
+    },
+    cancel() {
+      this.toggleCalendarScheduleMode(false)
+      this.toggleNavigation(true)
+      this.listWeek()
     },
   }
 }
