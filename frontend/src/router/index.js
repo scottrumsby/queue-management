@@ -12,35 +12,42 @@ import DashButtons from '../serve-citizen/dash-buttons'
 Vue.use(Router)
 
 export default new Router({
+  mode: 'history',
   routes: [
     {
-      path: '/',
+      path:'/',
+      redirect: '/dash',
       component: App,
-    },
-   /* {
-      path: 'cal',
-      components: {
-        default: Calendar,
-        buttons: ButtonsCalendar
-      }
-    },
-    {
-      path: 'exams',
-      components: {
-        default: Inventory,
-        buttons: InventoryButtons
-      }
-    },
-    {
-        path: 'dash',
-        components: {
-          default: Dash,
-          buttons: DashButtons
-        }
-    },
+        children: [
+          {
+            path: 'dash',
+            components: {
+              default: Dash,
+              buttons: DashButtons
+            }
+          },
+          {
+            path: 'cal',
+            components: {
+              default: Calendar,
+              buttons: ButtonsCalendar
+            }
+          },
+          {
+            path: 'exams',
+            components: {
+              default: Inventory,
+              buttons: InventoryButtons
+            }
+          },
+        ]
+      },
+    ]
+})
+
+   /*
+
     {
       path: '/smartboard',
       component: Smartboard
     }*/
-    ]
-})

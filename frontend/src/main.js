@@ -52,7 +52,7 @@ import BootstrapVue from 'bootstrap-vue'
 import App from './App'
 import { store } from './store/'
 import Smartboard from './smartboard/'
-import router from './router'
+import Router from './router'
 
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
@@ -107,23 +107,6 @@ const routes = {
 const app = new Vue({
   el: '#app',
   store,
-  components: { App, Smartboard },
-  computed: {
-    currentRoute() {
-      let path = window.location.pathname
-      let pathspl = path.split('/')
-      if ( path === '/') {
-        return '/'
-      } else if (pathspl.length >= 2) {
-        return pathspl[1]
-      } else {
-        return '/'
-      }
-    },
-    ViewComponent () {
-      return routes[this.currentRoute]
-    }
-  },
-
-  render (h) { return h(this.ViewComponent) }
+  router: Router,
+  template:'<router-view></router-view>'
 })

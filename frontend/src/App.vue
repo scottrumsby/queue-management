@@ -18,7 +18,7 @@ limitations under the License.*/
     <div id="fixed-viewport-app" :style="{width:`${x}px`, height:`${y}px`}">
       <Alert />
       <Modals />
-      <Nav v-if="isLoggedIn" />
+      <Nav v-if="isLoggedIn"/>
       <Socket v-show="1===2" />
       <Feedback />
       <Response />
