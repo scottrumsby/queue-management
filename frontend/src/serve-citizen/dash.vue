@@ -52,12 +52,7 @@ limitations under the License.*/
         <GAScreen />
       </div>
     </div>
-    <div v-if="showAdmin">
-      <iframe :src="iframeUrl"
-              :height="iframeHeight"
-              width="100%"
-              frameborder="0" />
-    </div>
+
   </div>
   <div v-else-if="isLoggedIn && !userLoadingFail">
     <div class="loader" style="margin-top: 250px"></div>
@@ -280,5 +275,8 @@ import ServeCitizen from './serve-citizen'
     to {
       -webkit-transform: rotate(360deg);
     }
+  }
+  fakeclass {
+    color: #e4c29c;
   }
 </style>

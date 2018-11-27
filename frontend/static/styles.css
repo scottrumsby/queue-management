@@ -1,0 +1,21 @@
+ button + a {
+    display: none !important;
+  }
+
+  body > div > nav > div.navbar-header > a {
+    background-color: green !important;
+  }
+
+  div.navbar-header {
+    display: none !important;
+    background-color: green !important;
+  }
+
+nav.navbar.navbar-default {
+      display: none !important;
+      background-color: green !important;
+  }
+  button.navbar-toggle {
+      display: none !important;
+      background-color: green !important;
+  }

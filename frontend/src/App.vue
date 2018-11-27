@@ -18,7 +18,7 @@ limitations under the License.*/
 
     <div id="fixed-viewport-app" :style="{width:`${x}px`, height:`${y}px`}">
       <Alert />
-      <Nav v-if="isLoggedIn"/>
+      <Nav v-if="isLoggedIn" />
       <Socket v-show="1===2" />
       <Feedback />
       <Response />
@@ -28,7 +28,7 @@ limitations under the License.*/
 </template>
 
 <script>
-  import { mapState } from 'vuex'
+  import { mapState, mapMutations } from 'vuex'
   import Alert from './alert'
   import Header from './layout/header'
   import Socket from './Socket'
@@ -58,9 +58,19 @@ limitations under the License.*/
       }
     },
     methods: {
+      ...mapMutations(['updateViewportSizes']),
       getSize() {
         this.x = window.innerWidth
         this.y = window.innerHeight - 78 - 40
+        console.log('getSize got this far')
+        this.updateStore()
+      },
+      updateStore() {
+        console.log(this.x)
+        let x =  parseInt(this.x)
+        let y = parseInt(this.y)
+        this.updateViewportSizes({w: x})
+        this.updateViewportSizes({h: y})
       }
     }
   }

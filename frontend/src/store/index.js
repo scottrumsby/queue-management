@@ -25,7 +25,37 @@ Vue.use(Vuex)
 export const store = new Vuex.Store({
 
   state: {
-    navigationVisible: false,
+    viewPortSizes: {
+      h: null,
+      w: null
+    },
+    addNonExamModalVisible: false,
+    examInventory: [
+      {}
+    ],
+    calendarResources: [
+      {id: 'room1', eventBackgroundColor:'#e4b9c', title: 'Boardroom 1' },
+      {id: 'room2', eventBackgroundColor:'#a6e4d', title: 'Boardroom 2' },
+      {id: 'room3', eventBackgroundColor:'#e4c29c', title: 'Flexroom 1' },
+    ],
+    calendarScheduleMode: false,
+    eventSource: {
+      events: [
+        {
+          title: 'Exam 1',
+          start: '2018-11-27T09:00:00',
+          end: '2018-11-27T12:00:00',
+          resourceId: 'room1',
+        },
+        {
+          title: 'Exam 2',
+          start: '2018-11-28T09:00:00',
+          end: '2018-11-28T12:00:00',
+          resourceId: 'room2',
+        }
+      ]
+    },
+    navigationVisible: true,
     addModalForm: {
       citizen:'',
       comments: '',
@@ -1397,6 +1427,8 @@ export const store = new Vuex.Store({
 
     toggleAddNextService: (state, payload) => state.addNextService = payload,
 
+    toggleCalendarScheduleMode: (state, payload) => state.calendarScheduleMode = payload,
+
     toggleShowAdmin: (state) => state.showAdmin = !state.showAdmin,
 
     setFeedbackMessage: (state, payload) => state.feedbackMessage = payload,
@@ -1412,6 +1444,17 @@ export const store = new Vuex.Store({
 
     hideResponseModal(state) {
       state.showResponseModal = false
-    }
+    },
+    toggleNonExamModal:  (state, payload) => state.addNonExamModalVisible = payload,
+    updateViewportSizes(state, attr) {
+      console.log(attr)
+      let key = Object.keys(attr)[0]
+      Vue.set(
+        state.viewPortSizes,
+        key,
+        attr[key]
+      )
+    },
+
   }
 })

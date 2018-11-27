@@ -18,10 +18,20 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import App from './App'
 import Dash from './serve-citizen/dash.vue'
-import DashButtons from '@/serve-citizen/dash-buttons'
+import ButtonsDash from '@/serve-citizen/dash-buttons'
 import Smartboard from './smartboard/'
+import ButtonsCalendar from '@/room-booking/buttons-calendar'
+import Calendar from '@/room-booking/calendar'
+import Inventory from '@/exams/inventory'
+import ButtonsInventory from '@/exams/buttons-inventory'
+import ButtonsAdmin from './ButtonsAdmin'
+import Admin from './Admin'
 
 Vue.use(Router)
+
+const AdminTitle = Vue.component('admin-title',{
+  template: '<div><span style="font-weight: 500; font-size: 1.90rem">Administration</span></div>'
+})
 
 export default new Router({
   mode: 'history',
@@ -35,8 +45,29 @@ export default new Router({
             path: 'queue',
             components: {
               default: Dash,
-              buttons: DashButtons,
+              buttons: ButtonsDash,
             },
+          },
+          {
+            path: 'schedule',
+            components: {
+              default: Calendar,
+              buttons: ButtonsCalendar,
+            },
+          },
+          {
+            path: 'exams',
+            components: {
+              default: Inventory,
+              buttons: ButtonsInventory
+            }
+          },
+          {
+            path: 'admin',
+            components: {
+              default: Admin,
+              buttons: ButtonsAdmin
+            }
           },
         ]
     },
