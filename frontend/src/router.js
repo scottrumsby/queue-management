@@ -64,7 +64,7 @@ export default new Router({
       props: true,
     },
     {
-      path:'/smartboard/',
+      path: '/smartboard/',
       component: Smartboard,
     },
   ]
