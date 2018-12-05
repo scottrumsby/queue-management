@@ -22,21 +22,29 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import './assets/css/bc-gov-style.css'
 import { library } from '@fortawesome/fontawesome-svg-core'
+<<<<<<< HEAD
 import {
   faSort,
   faBars,
   faCheck
 } from '@fortawesome/free-solid-svg-icons'
+=======
+import { faBars, faBinoculars, faFilter, faSort } from '@fortawesome/free-solid-svg-icons'
+>>>>>>> added route for exam managementand created basic layout including button controls and table
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import VDragged from 'v-dragged'
 
 Vue.use(VDragged)
+<<<<<<< HEAD
 library.add(
   faSort,
   faBars,
   faCheck
 )
 
+=======
+library.add(faBars, faBinoculars, faFilter, faSort)
+>>>>>>> added route for exam managementand created basic layout including button controls and table
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 Vue.use(BootstrapVue)
 
