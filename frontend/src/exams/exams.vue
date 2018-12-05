@@ -8,15 +8,16 @@
 </template>
 
 <script>
+  import { mapActions } from 'vuex'
   import ExamInventoryTable from './exam-inventory-table'
 
   export default {
     name: "Exams",
-    components: { ExamInventoryTable }
+    components: { ExamInventoryTable },
   }
 </script>
 
-<style scoped>
+<style scoped>[]
   .subheader {
     font-size: 1.0rem !important;
   }
