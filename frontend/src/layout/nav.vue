@@ -31,7 +31,7 @@
           </template>
           <div :style="{width:200+'px'}">
             <b-dropdown-item to="/queue">The Q</b-dropdown-item>
-
+            <b-dropdown-item to="/exams">Manage Exams</b-dropdown-item>
             <template  v-if="user.role && user.role.role_code=='GA'">
               <b-dropdown-item @click="clickGAScreen">
                 <b-check :checked="showGAScreenModal"><span style="font-weight: 400;">Show GA Panel</span></b-check>
@@ -76,7 +76,7 @@
       ]),
       showAdmin() {
         let roles = ['GA', 'ANALYTICS', 'HELPDESK', 'SUPPORT']
-        if (this.user) {
+        if (this.user && this.user.role && this.user.role.role_code) {
           if (roles.includes(this.user.role.role_code)) {
             return true
           }

@@ -22,41 +22,52 @@ import ButtonsDash from '@/serve-citizen/dash-buttons'
 import Smartboard from './smartboard/'
 import ButtonsAdmin from './buttons-admin'
 import Admin from './admin'
+import Exams from './exams/exams'
+import ButtonsExams from './exams/buttons-exams'
+import { mapState } from 'vuex'
 
 Vue.use(Router)
 
 export default new Router({
-  mode: 'history',
-  routes: [
-    {
-      path: '/',
-      component: App,
-      redirect: '/queue',
-      children: [
-        {
-          path: 'queue',
-          components: {
-            default: Dash,
-            buttons: ButtonsDash,
+    mode: 'history',
+    routes: [
+      {
+        path: '/',
+        component: App,
+        redirect: '/queue',
+        children: [
+          {
+            path: 'queue',
+            components: {
+              default: Dash,
+              buttons: ButtonsDash,
+            },
           },
-        },
-        {
-          path: 'admin',
-          components: {
-            default: Admin,
-            buttons: ButtonsAdmin
-          }
-        },
-      ]
-    },
-    {
-      path:'/smartboard/:id',
-      component: Smartboard,
-      props: true,
-    },
-    {
-      path:'/smartboard/',
-      component: Smartboard,
-    },
-  ]
-})
+          {
+            path: 'admin',
+            components: {
+              default: Admin,
+              buttons: ButtonsAdmin
+            }
+          },
+          {
+            path: 'exams',
+            components: {
+              default: Exams,
+              buttons: ButtonsExams
+            }
+          },
+        ]
+      },
+      {
+        path: '/smartboard/:id',
+        component: Smartboard,
+        props: true,
+      },
+      {
+        path: '/smartboard/',
+        component: Smartboard,
+      },
+    ]
+  })
+
