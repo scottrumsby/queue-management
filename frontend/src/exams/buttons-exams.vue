@@ -8,10 +8,11 @@
 <script>
   import { mapMutations } from 'vuex'
   import AddIndividualItaExam from './add-individual-ita-exam'
+  import CaptureIndITABase from './capture-ind-ita-base'
 
   export default {
     name: "ButtonsExams",
-    components: { AddIndividualItaExam },
+    components: { CaptureIndITABase, AddIndividualItaExam },
     methods: {
       ...mapMutations(['toggleAddIndividualITAExam']),
       clickAddIndividual() {
