@@ -164,23 +164,7 @@ export const store = new Vuex.Store({
       office_id: null,
     },
     addIndividualITAExamModalVisibe: false,
-    examInventory: [
-      {
-        event_id: 1,
-        booking_id: null,
-        exam_type_id: 2,
-        invigilator_id: null,
-        office_id: 1,
-        exam_name: 'Some Exam Name',
-        examinee_name: 'Student One',
-        expiry_date: 'Jan 22, 2019',
-        notes: '250-477-3960',
-        exam_received: 'Oct 24, 2018',
-        session_number: null,
-        number_of_students: 1,
-        exam_method: 'online',
-      },
-    ],
+    exams: [],
     iframeLogedIn: false,
     viewPortSizes: {
       h: null,
@@ -541,6 +525,32 @@ export const store = new Vuex.Store({
       Axios(context).get('/csrs/')
         .then(resp => {
           context.commit('setCsrs', resp.data.csrs)
+        })
+        .catch(error => {
+          console.log('error @ store.actions.getCsrs')
+          console.log(error.response)
+          console.log(error.message)
+        })
+    },
+
+    getExams(context) {
+      let url = '/exams/'
+
+      if (context.state.examFilters.length > 0) {
+        url += "?"
+
+        context.state.examFilters.forEach((filter, index) => {
+          url += `${filter.key}=${filter.value}`
+
+          if (index > 0) {
+            url += "&"
+          }
+        })
+      }
+
+      Axios(context).get(url)
+        .then(resp => {
+          context.commit('setExams', resp.data.exams)
         })
         .catch(error => {
           console.log('error @ store.actions.getCsrs')
@@ -1608,6 +1618,11 @@ export const store = new Vuex.Store({
       state.csrs = payload
     },
 
+    setExams(state, payload) {
+      state.exams = []
+      state.exams = payload
+    },
+
     updateCitizen(state, payload) {
       Vue.set(state.citizens, payload.index, payload.citizen)
     },
@@ -1724,16 +1739,6 @@ export const store = new Vuex.Store({
           payload[key]
         )
       })
-    },
-
-    setExamInventory(state, exams) {
-      let inventory = []
-      exams.forEach(exam =>{
-        exam.expiry_date = exam.expiry_date.split('T')[0]
-        exam.exam_received = exam.exam_received === 1 ? 'Yes' : 'No'
-        inventory.push(exam)
-      })
-      state.examInventory = inventory
     },
 
     toggleIndividualCaptureTabRadio(state, payload) {
