@@ -25,7 +25,7 @@ Vue.use(Vuex)
 export const store = new Vuex.Store({
 
   state: {
-    addIndividualITAsteps: [
+    addIndITASteps: [
       {
         step: 1,
         title:'Exam Type',
@@ -83,7 +83,7 @@ export const store = new Vuex.Store({
         questions: [
           {
             kind: 'exam_received',
-            key: 'exam_received',
+            key: 'exam_received_date',
             text1:'Was the Exam Package Receieved Today?',
             text2: 'Date of Receipt of Exam Package',
             minLength: 0,
@@ -156,7 +156,8 @@ export const store = new Vuex.Store({
       examinee_name: null,
       expiry_date: null,
       notes: null,
-      exam_received: null,
+      exam_received: false,
+      exam_received_date: null,
       number_of_students: null,
       exam_method: 'paper',
       exam_type_id: null,
@@ -1197,6 +1198,41 @@ export const store = new Vuex.Store({
       }
     },
 
+    postExam(context, payload) {
+      let captured = context.state.capturedExam
+      let examObj = {}
+      let steps
+      let extra = {}
+      switch (payload) {
+        case 'ind_ita':
+          steps = context.state.addIndITASteps
+          extra = {
+            exam_received: 1
+          }
+          if (context.getters.role_code === 'CSR' || context.getters.role_code === 'GA') {
+            extra['office_id'] = context.state.user.office_id
+          }
+          break
+        case 'group_ita':
+          steps = null
+          break
+        default:
+          steps = null
+          end
+      }
+      let keys = steps.map(step=>step.questions.map(q=>q.key)).flat()
+      keys.forEach(key => {
+        examObj[key] = captured[key]
+      })
+      let expiry = examObj['expiry_date']
+      let received = examObj['exam_received']
+      examObj = {...examObj, ...extra}
+      Axios(context).post('/exams/', examObj)
+        .then(resp => {
+          console.log(resp.data)
+        })
+    },
+
     postServiceReq(context) {
       let { form_data } = context.getters
       let { citizen_id } = form_data.citizen
@@ -1690,6 +1726,12 @@ export const store = new Vuex.Store({
     toggleAddIndividualITAExam: (state, payload) => state.addIndividualITAExamModalVisibe = payload,
 
     captureExamDetail(state, payload) {
+      if (payload.key === 'exam_type_id') {
+        payload.value = Number(payload.value)
+      }
+      if (payload.key === 'event_id') {
+        payload.value = payload.value.toString()
+      }
       Vue.set(
         state.capturedExam,
         payload.key,

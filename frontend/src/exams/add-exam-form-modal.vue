@@ -41,7 +41,7 @@
                     @click="submitMsg='You have an error on a previous step.  Click on the red tab.'"
                     class="btn-primary disabled">Submit</b-button>
           <b-button v-else
-                    class="btn-primary">Submit</b-button>
+                    class="btn-primary" @click="submit">Submit</b-button>
         </div>
       </div>
     </template>
@@ -85,7 +85,7 @@
         exam: state => state.capturedExam,
         examTypes: state => state.examTypes,
         modalVisible: state => state.addIndividualITAExamModalVisibe,
-        steps: state => state.addIndividualITAsteps,
+        steps: state => state.addIndITASteps,
         tab: state => state.captureITAExamTabSetup,
       }),
       errors() {
@@ -161,7 +161,6 @@
       clickCancel() {
         this.toggleAddIndividualITAExam(false)
       },
-
       clickNext() {
         let step = this.step + 1
         this.updateCaptureTab({step})
@@ -170,23 +169,22 @@
           this.updateCaptureTab({highestStep: step})
         }
       },
-
       clickTab(e) {
         this.updateCaptureTab({step: e})
       },
-
+      submit() {
+        this.postExam('ind_ita')
+      },
       resetModal() {
         this.resetCaptureForm()
         this.resetCaptureTab()
       },
-
       setWarning() {
         if (!this.errors.includes(this.step)) {
           let errors = this.errors.concat([this.step])
           this.updateCaptureTab({errors})
         }
       },
-
     }
   }
 </script>

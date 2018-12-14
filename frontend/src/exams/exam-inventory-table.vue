@@ -54,9 +54,10 @@
       this.getExams()
     },
     computed: {
+      ...mapGetters(['role_code']),
       ...mapState(['exams', 'user']),
       getFields() {
-        if ("LIASON" === this.user.role.role_code) {
+        if (this.role_code === "LIAISON") {
           return this.fields
         } else {
           let returnFields = this.fields
