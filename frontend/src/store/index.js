@@ -25,7 +25,7 @@ Vue.use(Vuex)
 export const store = new Vuex.Store({
 
   state: {
-    addIndITASteps: [
+    addIndividualITAsteps: [
       {
         step: 1,
         title:'Exam Type',
@@ -83,7 +83,7 @@ export const store = new Vuex.Store({
         questions: [
           {
             kind: 'exam_received',
-            key: 'exam_received_date',
+            key: 'exam_received',
             text1:'Was the Exam Package Receieved Today?',
             text2: 'Date of Receipt of Exam Package',
             minLength: 0,
@@ -126,27 +126,26 @@ export const store = new Vuex.Store({
       stepsValidated: [],
       errors: [],
       showRadio: true,
-      success: '',
-      notes: false,
     },
+    bookings: [],
     examTypes: [
       {
         exam_type_name: 'ODSC 1 SINGLE-3HR+1HR-READER OWN',
-        exam_type_id: 1,
+        exam_type_id: 2,
         header: false,
         class:'add-exam-list-item',
         exam_type_colour: '#f7e1b5'
       },
       {
         exam_type_name: 'CWERC 1 SINGLE-3HR+1HR-READER SBC',
-        exam_type_id: 2,
+        exam_type_id: 3,
         header: false,
         class:'add-exam-list-item',
         exam_type_colour: '#b6e1b6'
       },
       {
         exam_type_name: 'CWERC 2 SINGLE-3HR NONE',
-        exam_type_id: 3,
+        exam_type_id: 4,
         header: false,
         class:'add-exam-list-item',
         exam_type_colour: '#b6e1b6'
@@ -158,8 +157,7 @@ export const store = new Vuex.Store({
       examinee_name: null,
       expiry_date: null,
       notes: null,
-      exam_received: false,
-      exam_received_date: null,
+      exam_received: null,
       number_of_students: null,
       exam_method: 'paper',
       exam_type_id: null,
@@ -202,6 +200,7 @@ export const store = new Vuex.Store({
     nowServing: false,
     officeType: null,
     performingAction: false,
+    rooms: [],
     serveNowAltAction: false,
     serveNowStyle: 'btn-primary',
     serviceBegun: false,
@@ -462,6 +461,13 @@ export const store = new Vuex.Store({
         context.commit('setUserLoadingFail', true)
       })
     },
+    
+    getBookings(context) {
+      Axios(context).get('/bookings/')
+        .then(resp => {
+          context.commit('setBookings', resp.data.bookings)
+        })
+    },
 
     getAllCitizens(context) {
       let url = '/citizens/'
@@ -542,9 +548,15 @@ export const store = new Vuex.Store({
           context.commit('setExams', resp.data.exams)
         })
         .catch(error => {
-          console.log('error @ store.actions.getCsrs')
-          console.log(error.response)
-          console.log(error.message)
+          console.log('error @ store.actions.getExams')
+          console.log(error)
+        })
+    },
+    
+    getRooms(context) {
+      Axios(context).get('/rooms/')
+        .then(resp => {
+          context.commit('setRooms', resp.data.rooms)
         })
     },
 
@@ -700,12 +712,6 @@ export const store = new Vuex.Store({
         })
       }).catch(() => {
         context.commit('setPerformingAction', false)
-      })
-    },
-
-    clickAddExamSubmit(context, type) {
-      context.dispatch('postExam', type).finally( () => {
-        context.dispatch('getExams')
       })
     },
 
@@ -1192,44 +1198,6 @@ export const store = new Vuex.Store({
       }
     },
 
-    postExam(context, payload) {
-      let capturedExam = context.state.capturedExam
-      let examObj = {}
-      let steps
-      let additionalKeys = {}
-      switch (payload) {
-        case 'ind_ita':
-          steps = context.state.addIndITASteps
-          additionalKeys = {
-            exam_received: 1,
-            office_id: context.state.user.office_id
-          }
-          break
-        case 'group_ita':
-          steps = null
-          break
-        default:
-          steps = null
-          end
-      }
-      let keys = steps.map(step=>step.questions.map(q=>q.key)).flat()
-      keys.forEach(key => {
-        examObj[key] = capturedExam[key]
-      })
-      let data = {...examObj, ...additionalKeys}
-
-      return new Promise((resolve, reject) => {
-        Axios(context).post('/exams/', data).then(resp=>{
-          context.commit('updateCaptureTab', {success: true})
-          resolve(resp)
-        })
-          .catch( error => {
-            context.commit('updateCaptureTab', {success: false})
-            reject(error)
-        })
-      })
-    },
-
     postServiceReq(context) {
       let { form_data } = context.getters
       let { citizen_id } = form_data.citizen
@@ -1503,9 +1471,9 @@ export const store = new Vuex.Store({
       state.categories = []
       state.categories = payload
     },
-
+  
     toggleAddModal: (state, payload) => state.showAddModal = payload,
-
+  
     updateAddModalForm(state, payload) {
       Vue.set(
         state.addModalForm,
@@ -1513,46 +1481,46 @@ export const store = new Vuex.Store({
         payload.value
       )
     },
-
+  
     setAddModalSelectedItem(state, payload) {
       state.addModalForm.suspendFilter = true
       state.addModalForm.selectedItem = payload
     },
-
+  
     resetAddModalForm(state) {
       let keys = Object.keys(state.addModalForm)
-
+    
       keys.forEach(key => {
-        if ( key !== 'quick' && key !== 'suspendFilter' ) Vue.set(
+        if (key !== 'quick' && key !== 'suspendFilter') Vue.set(
           state.addModalForm,
           key,
           ''
         )
-        if ( key === 'quick' ) Vue.set(
+        if (key === 'quick') Vue.set(
           state.addModalForm,
           key,
           0
         )
-        if ( key === 'priority' ) Vue.set(
+        if (key === 'priority') Vue.set(
           state.addModalForm,
           key,
           2
         )
-        if ( key === 'suspendFilter' ) Vue.set(
+        if (key === 'suspendFilter') Vue.set(
           state.addModalForm,
           key,
           false
         )
       })
     },
-
+  
     switchAddModalMode(state, payload) {
       state.addModalSetup = payload
     },
-
+  
     setAddModalData(state, data) {
       let { citizen, active_service } = data
-
+    
       let formData = {
         comments: citizen.citizen_comments,
         quick: citizen.qt_xn_citizen_ind,
@@ -1566,13 +1534,13 @@ export const store = new Vuex.Store({
         Vue.set(
           state.addModalForm,
           key,
-          formData[ key ]
+          formData[key]
         )
       })
     },
-
+  
     toggleServiceModal: (state, payload) => state.showServiceModal = payload,
-
+  
     setServiceModalForm(state, citizen) {
       let citizen_comments = citizen.citizen_comments
       let activeService = citizen.service_reqs.filter(sr => sr.periods.some(p => p.time_end === null))
@@ -1581,19 +1549,19 @@ export const store = new Vuex.Store({
       let service_citizen = citizen
       let quick = citizen.qt_xn_citizen_ind
       let priority = citizen.priority
-
+    
       let obj = { citizen_comments, activeQuantity, citizen_id, service_citizen, quick, priority }
       let keys = Object.keys(obj)
-
+    
       keys.forEach(key => {
         Vue.set(
           state.serviceModalForm,
           key,
-          obj[ key ]
+          obj[key]
         )
       })
     },
-
+  
     resetServiceModal(state) {
       let { serviceModalForm } = state
       let keys = Object.keys(serviceModalForm)
@@ -1602,9 +1570,9 @@ export const store = new Vuex.Store({
         "serveModalAlert",
         ""
       )
-
+    
       keys.forEach(key => {
-        if ( key === 'activeQuantity' ) {
+        if (key === 'activeQuantity') {
           Vue.set(
             state.serviceModalForm,
             key,
@@ -1619,7 +1587,7 @@ export const store = new Vuex.Store({
         }
       })
     },
-
+  
     editServiceModalForm(state, payload) {
       Vue.set(
         state.serviceModalForm,
@@ -1627,86 +1595,86 @@ export const store = new Vuex.Store({
         payload.value
       )
     },
-
+  
     setDefaultChannel(state) {
       let channel = state.channels.filter(ch => ch.channel_name === 'In Person')
-      state.addModalForm.channel = channel[ 0 ].channel_id
+      state.addModalForm.channel = channel[0].channel_id
     },
-
+  
     setMainAlert(state, payload) {
       state.alertMessage = payload
       state.dismissCount = 5
     },
-
+  
     setModalAlert(state, payload) {
       state.alertMessage = payload
     },
-
+  
     setServeModalAlert(state, payload) {
       state.serveModalAlert = payload
     },
-
+  
     setCsrs(state, payload) {
       state.csrs = []
       state.csrs = payload
     },
-
+  
     setExams(state, payload) {
       state.exams = []
       state.exams = payload
     },
-
+  
     updateCitizen(state, payload) {
       Vue.set(state.citizens, payload.index, payload.citizen)
     },
-
+  
     addCitizen(state, citizen) {
       state.citizens.push(citizen)
     },
-
+  
     dismissCountDown(state, payload) {
       state.dismissCount = payload
     },
-
+  
     toggleInvitedStatus: (state, payload) => state.citizenInvited = payload,
-
+  
     toggleBegunStatus: (state, payload) => state.serviceBegun = payload,
-
-    toggleGAScreenModal: (state,payload) => state.showGAScreenModal = payload,
-
+  
+    toggleGAScreenModal: (state, payload) => state.showGAScreenModal = payload,
+  
     setQuickTransactionState: (state, payload) => state.user.qt_xn_csr_ind = payload,
-
+  
     setReceptionistState: (state, payload) => state.user.receptionist_ind = payload,
-
+  
     setCSRState: (state, payload) => state.user.csr_state_id = payload,
-
+  
     setOffice: (state, officeType) => state.officeType = officeType,
-
+  
     flashServeNow: (state, payload) => state.serveNowStyle = payload,
-
+  
     setServeNowAction: (state, payload) => state.serveNowAltAction = payload,
-
+  
     toggleFeedbackModal: (state, payload) => state.showFeedbackModal = payload,
-
+  
     toggleAddNextService: (state, payload) => state.addNextService = payload,
-
+  
     toggleShowAdmin: (state) => state.showAdmin = !state.showAdmin,
-
+  
     setFeedbackMessage: (state, payload) => state.feedbackMessage = payload,
-
+  
     setPerformingAction: (state, payload) => state.performingAction = payload,
-
+  
     setUserLoadingFail: (state, payload) => state.userLoadingFail = payload,
-
+  
     showHideResponseModal(state) {
       state.showResponseModal = true
-      setTimeout( ()=> {state.showResponseModal = false}, 3000)
+      setTimeout(() => {state.showResponseModal = false}, 3000)
     },
-
+  
     hideResponseModal(state) {
       state.showResponseModal = false
     },
-
+  
     updateViewportSizes(state, attr) {
       let key = Object.keys(attr)[0]
       Vue.set(
@@ -1715,27 +1683,21 @@ export const store = new Vuex.Store({
         attr[key]
       )
     },
-
+  
     setiframeLogedIn: (state, value) => state.iframeLogedIn = value,
-
+  
     setNavigation: (state, value) => state.adminNavigation = value,
-
+  
     toggleAddIndividualITAExam: (state, payload) => state.addIndividualITAExamModalVisibe = payload,
-
+  
     captureExamDetail(state, payload) {
-      if (payload.key === 'exam_type_id') {
-        payload.value = Number(payload.value)
-      }
-      if (payload.key === 'event_id') {
-        payload.value = payload.value.toString()
-      }
       Vue.set(
         state.capturedExam,
         payload.key,
         payload.value
       )
     },
-
+  
     resetCaptureForm(state) {
       let keys = Object.keys(state.capturedExam)
       keys.forEach(key => {
@@ -1750,16 +1712,14 @@ export const store = new Vuex.Store({
         )
       })
     },
-
+  
     resetCaptureTab(state) {
       let initialState = {
         step: 1,
         highestStep: 1,
         stepsValidated: [],
         errors: [],
-        showRadio: true,
-        success: '',
-        notes: false
+        showRadio: true
       }
       let keys = Object.keys(initialState)
       keys.forEach(key => {
@@ -1770,10 +1730,10 @@ export const store = new Vuex.Store({
         )
       })
     },
-
+  
     updateCaptureTab(state, payload) {
       let keys = Object.keys(payload)
-      keys.forEach(key=>{
+      keys.forEach(key => {
         Vue.set(
           state.captureITAExamTabSetup,
           key,
@@ -1781,13 +1741,17 @@ export const store = new Vuex.Store({
         )
       })
     },
-
+  
     toggleIndividualCaptureTabRadio(state, payload) {
       Vue.set(
         state.captureITAExamTabSetup,
         'showRadio',
         payload
       )
-    }
+    },
+  
+    setBookings: (state, payload) => state.bookings = payload,
+    
+    setRooms: (state, payload) => state.rooms = payload,
   }
 })

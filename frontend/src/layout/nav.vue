@@ -32,6 +32,7 @@
           <div :style="{width:200+'px'}">
             <b-dropdown-item to="/queue">The Q</b-dropdown-item>
             <b-dropdown-item to="/exams">Manage Exams</b-dropdown-item>
+            <b-dropdown-item to="/booking" v-if="isGAorCSR">Room Booking</b-dropdown-item>
             <template  v-if="user.role && user.role.role_code=='GA'">
               <b-dropdown-item @click="clickGAScreen" :class="gaPanelStyle">
                 <font-awesome-icon v-if="showGAScreenModal"
@@ -78,6 +79,14 @@
         'showGAScreenModal',
         'user'
       ]),
+      isGAorCSR() {
+        if (this.user && this.user.role) {
+          if (this.user.role.role_code === 'CSR' || this.user.role.role_code === 'GA') {
+            return true
+          }
+        }
+        return false
+      },
       gaPanelStyle() {
         let classStyle = 'gaScreenUnchecked'
         if (this.showGAScreenModal) {

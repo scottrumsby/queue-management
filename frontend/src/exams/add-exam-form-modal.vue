@@ -125,7 +125,7 @@
         exam: state => state.capturedExam,
         examTypes: state => state.examTypes,
         modalVisible: state => state.addIndividualITAExamModalVisibe,
-        steps: state => state.addIndITASteps,
+        steps: state => state.addIndividualITAsteps,
         tab: state => state.captureITAExamTabSetup,
       }),
       success() {

@@ -92,7 +92,7 @@
       ...mapGetters(['exam_object']),
       ...mapState({
         exam: state => state.capturedExam,
-        steps: state => state.addIndITASteps,
+        steps: state => state.addIndividualITAsteps,
         tab: state => state.captureITAExamTabSetup,
       }),
       error() {
