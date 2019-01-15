@@ -13,38 +13,17 @@ export function Axios(context) {
   )
 }
 
-export const invitedCitizen = {
-    citizen_comments: null,
-    ticket_number: null,
-    citizen_id: null,
-    qt_xn_citizen_ind: null,
-    start_time: null,
-    priority: null,
-    service_reqs: [
-      {
-        start_time: null,
-        service: {
-          parrent: {}
-        },
-        service_id: null,
-        sr_id: null,
-        channel: {
-          channel_name: null,
-          channel_id: null
-        }
-      }
-    ]
-
-}
-
-export const formData = {
-  citizen:'',
-  setup:'',
-  comments: '',
-  channel: '',
-  search: '',
-  category: '',
-  service:'',
-  quick: false,
-  priority: 2
+export function adjustColor(col, amt) {
+  col = col.split('#')[1]
+  let num = parseInt(col,16)
+  let r = (num >> 16) + amt
+  if (r > 255) r = 255
+  else if  (r < 0) r = 0
+  let b = ((num >> 8) & 0x00FF) + amt
+  if (b > 255) b = 255
+  else if  (b < 0) b = 0
+  let g = (num & 0x0000FF) + amt
+  if (g > 255) g = 255
+  else if (g < 0) g = 0
+  return '#' + (g | (b << 8) | (r << 16)).toString(16)
 }

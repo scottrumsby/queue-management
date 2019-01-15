@@ -1,11 +1,11 @@
 <template>
-    <div :style="mainDivStyle">
-      <SchedulingIndicator :cancel="cancel" />
+    <div style="position: relative" ref="calcontainer">
       <keep-alive>
         <full-calendar ref="bookingcal"
                        key="bookingcal"
                        id="bookingcal"
                        class="q-calendar-margins"
+                       @event-selected="eventSelected"
                        @view-render="viewRender"
                        @event-created="selectEvent"
                        :events="events"
@@ -25,6 +25,7 @@
     <BookingModal />
     <ExamInventoryModal v-if="showExamInventoryModal" />
     <OtherBookingModal />
+    <EditBookingModal />
   </div>
 </template>
 
@@ -39,10 +40,19 @@
   import 'fullcalendar/dist/fullcalendar.css'
   import 'fullcalendar-scheduler'
   import SchedulingIndicator from './scheduling-indicator'
+  import EditBookingModal from './edit-booking-modal'
 
   export default {
     name: 'Calendar',
-    components: { SchedulingIndicator, BookingModal, DropdownCalendar, ExamInventoryModal, FullCalendar, OtherBookingModal },
+    components: {
+      BookingModal,
+      DropdownCalendar,
+      EditBookingModal,
+      ExamInventoryModal,
+      FullCalendar,
+      OtherBookingModal,
+      SchedulingIndicator,
+    },
     mounted() {
       this.initialize()
       this.$root.$on('next', () => { this.next() })
@@ -54,9 +64,12 @@
       this.$root.$on('agendaDay', () => { this.agendaDay() })
       this.$root.$on('options', (option) => { this.options(option) })
       this.$root.$on('initialize', () => { this.initialize() })
+      this.$root.$on('cancel', () => { this.cancel() })
+      this.$root.$on('updateEvent', (event, params) => {this.updateEvent(event, params) })
     },
     data() {
       return {
+        tempEvent: null,
         setup: {
           selectable: false,
           unselectCancel: '.modal, .modal-content',
@@ -72,10 +85,12 @@
             agendaDay: {
               allDaySlot: false,
               groupByResource: true,
+              nowIndicator: true,
             },
             agendaWeek: {
               allDaySlot: false,
               groupByDateAndResource: true,
+              nowIndicator: true,
             },
             month: {
               allDaySlot: false,
@@ -92,22 +107,30 @@
             right: null
           },
         },
-      }
+          }
     },
     computed: {
-      ...mapGetters(['calendar_events', 'room_resources']),
+      ...mapGetters(['calendar_events', 'room_resources', 'view_port']),
       ...mapState([
         'calendarSetup',
         'exams',
         'exam_types',
         'scheduling',
+        'editedBooking',
+        'editedBookingOriginal',
         'schedulingOther',
         'selectedExam',
+        'rescheduling',
         'showBookingModal',
         'showExamInventoryModal',
         'showSchedulingIndicator',
-        'viewPortSizes',
       ]),
+      adjustment() {
+        if (this.showSchedulingIndicator) {
+          return 240
+        }
+        return 190
+      },
       calView() {
         if (this.calendarSetup && this.calendarSetup.viewName) {
           return this.calendarSetup.viewName
@@ -133,12 +156,15 @@
       this.setCalendarSetup(null)
     },
     methods: {
-      ...mapActions(['getBookings', 'finishBooking', 'initializeAgenda', 'getExamTypes']),
+      ...mapActions(['getBookings', 'finishBooking', 'initializeAgenda', 'getExamTypes', 'resetRescheduling']),
       ...mapMutations([
         'setCalendarSetup',
         'setClickedDate',
+        'setEditedBooking',
+        'setEditedBookingOriginal',
         'setSelectedExam',
         'toggleBookingModal',
+        'toggleEditBookingModal',
         'toggleOtherBookingModal',
         'toggleScheduling',
         'toggleSchedulingIndicator',
@@ -151,9 +177,33 @@
         this.$refs.bookingcal.fireMethod('changeView', 'agendaWeek')
       },
       cancel() {
-        //passed to child component SchedulingIndicator as prop
+        if (this.editedBooking) {
+          this.toggleEditBookingModal(true)
+          this.toggleSchedulingIndicator(false)
+          this.$refs.bookingcal.fireMethod('rerenderEvents')
+          return
+        }
         this.finishBooking()
         this.options({name: 'selectable', value: false})
+      },
+      removeEvent() {
+        let event = this.editedBooking
+        event.backgroundColor = 'white '
+        this.$refs.bookingcal.fireMethod('updateEvent', event)
+      },
+      eventSelected(event, jsEvent, view) {
+        this.setEditedBooking(event)
+        if (Object.keys(event).includes('exam')) {
+          this.setSelectedExam(event.exam)
+        }
+        this.setEditedBookingOriginal(event)
+        this.toggleEditBookingModal(true)
+      },
+      updateEvent(event, params) {
+        Object.keys(params).forEach(key => {
+          event[key] = params[key]
+        })
+        this.$refs.bookingcal.fireMethod('updateEvent', event)
       },
       initialize() {
         this.getExamTypes()
@@ -168,11 +218,6 @@
           })
           this.getBookings()
         })
-      },
-      mainDivStyle() {
-        return {
-          position: 'relative'
-        }
       },
       month() {
         this.$refs.bookingcal.fireMethod('changeView', 'month')
@@ -189,20 +234,56 @@
       prev() {
         this.$refs.bookingcal.fireMethod('prev')
       },
+      delete() {
+
+      },
       selectEvent(event) {
+        //overrides the default behavior (sets event=all day event on the day) to a view change instead
         if (this.calendarSetup.viewName === 'month') {
           this.goToDate(event.start.local())
           this.agendaDay()
           return
         }
-        if (this.scheduling) {
-          this.setClickedDate(event)
+        if (this.rescheduling) {
+          let booking = this.editedBookingOriginal
+          if (Object.keys(booking).includes('exam')) {
+            this.unselect()
+            let { number_of_hours } = this.selectedExam.exam_type
+            let endTime = new moment(event.start).add(number_of_hours, 'h')
+            event.end = endTime
+            this.setClickedDate(event)
+            let tempEvent = {
+              start: new moment(event.start),
+              end: new moment(event.end),
+              title: '(NEW TIME) ' + booking.title,
+              borderColor: booking.room.color,
+              backgroundColor: 'white',
+              resourceId: event.resource.id,
+            }
+            if (this.tempEvent) {
+              this.$refs.bookingcal.fireMethod('removeEvents', [ this.tempEvent.id ])
+              let id = this.tempEvent.id.split('-')
+              tempEvent.id = id[0] + toString(( parseInt(id[1]) + 1 ))
+            } else {
+              tempEvent.id = 'temp-1'
+            }
+            this.tempEvent = tempEvent
+            console.log(tempEvent)
+            this.$refs.bookingcal.fireMethod('renderEvent', tempEvent, true)
+            this.toggleEditBookingModal(true)
+            return
+          }
           this.toggleSchedulingIndicator(false)
+          this.toggleEditBookingModal(true)
+          this.setClickedDate(event)
+          return
+        }
+        this.setClickedDate(event)
+        this.toggleSchedulingIndicator(false)
+        if (this.scheduling) {
           this.toggleBookingModal(true)
         }
         if (this.schedulingOther) {
-          this.setClickedDate(event)
-          this.toggleSchedulingIndicator(false)
           this.toggleOtherBookingModal(true)
         }
       },
@@ -211,22 +292,21 @@
       },
       viewRender(view, el) {
         this.setCalendarSetup({ title: view.title, viewName: view.name })
+        //overrides the default behaviour (basicDay view) when clicking on a date heading
         if (view.name === 'basicDay') {
           this.$refs.bookingcal.fireMethod('changeView', 'agendaDay')
         }
+        //fullCalendar auto-height doesn't work well here, calculate the height for month view
         if (view.name === 'month') {
-          let adj = 75
-          if (this.scheduling || this.schedulingOther) {
-            adj = 130
-          }
-          this.options({name: 'height', value: this.viewPortSizes.h - adj})
+          this.options({ name: 'height', value: window.innerHeight - this.adjustment })
         }
-        if (view.name === 'agendaDay' || view.name === 'agendaWeek' ) {
-          this.options({name: 'height', value: 'auto'})
+        //return the height to 'auto' upon switching back to the other views
+        if (view.name === 'agendaDay' || view.name === 'agendaWeek') {
+          this.options({ name: 'height', value: 'auto' })
         }
       },
       unselect() {
-        this.$refs.$bookingcal.fireMethod('unselect')
+        this.$refs.bookingcal.fireMethod('unselect')
       }
     }
   }

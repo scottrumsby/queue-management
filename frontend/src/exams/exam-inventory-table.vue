@@ -118,3 +118,10 @@
     }
   }
 </script>
+
+invigilatorNull() {
+  if (fields.booking.invigilator.invigilator_name) {
+    return fields.booking.invigilator.invigilator_name
+  }
+  return null
+}
