@@ -68,3 +68,26 @@
   font-weight: 600;
   padding-bottom: 5px;
 }
+.q-sum-td-outer-flex {
+  margin: 0px;
+  padding: 2px 10px 1px 10px !important;
+  display: flex;
+  justify-content: space-between;
+  border: 1px solid #e3e3e3;
+  box-shadow: 3px 3px 5px 0px #d0d0d0;
+}
+.q-sum-td-inner-flex {
+  display: flex;
+  max-height: 30px !important;
+  justify-content: space-between;
+  align-items: center;
+  font-size: .875rem;
+}
+.q-sum-td-head {
+  font-weight: bold;
+  font-size: .850rem;
+}
+.q-sum-td-item {
+  font-weight: lighter;
+  font-size: .825rem;
+}

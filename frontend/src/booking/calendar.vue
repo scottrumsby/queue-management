@@ -221,7 +221,7 @@
       this.setCalendarSetup(null)
     },
     methods: {
-      ...mapActions(['getBookings', 'finishBooking', 'initializeAgenda', 'getExamTypes',]),
+      ...mapActions(['getBookings', 'finishBooking', 'initializeAgenda', 'getExamTypes', 'getInvigilators']),
       ...mapMutations([
         'setCalendarSetup',
         'setClickedDate',
@@ -338,6 +338,7 @@
         this.$refs.bookingcal.fireMethod('gotoDate', date)
       },
       initialize() {
+        this.getInvigilators()
         this.setSelectionIndicator(false)
         this.getExamTypes()
         this.initializeAgenda().then( resources => {
