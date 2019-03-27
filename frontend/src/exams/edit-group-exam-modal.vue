@@ -15,19 +15,19 @@
                 <div class="q-id-grid-head">Exam Details</div>
                 <div class="q-id-grid-col">
                   <div>Exam: </div>
-                  <div>{{ examRow.exam_name }}</div>
+                  <div>{{ actionedExam.exam_name }}</div>
                 </div>
                 <div class="q-id-grid-col">
                   <div>Event ID: </div>
-                  <div>{{ examRow.event_id }}</div>
+                  <div>{{ actionedExam.event_id }}</div>
                 </div>
                 <div class="q-id-grid-col">
                   <div>Type: </div>
-                  <div>{{ examRow.exam_type.exam_type_name }}</div>
+                  <div>{{ actionedExam.exam_type.exam_type_name }}</div>
                 </div>
                 <div class="q-id-grid-col">
                   <div>Writers: </div>
-                  <div>{{ examRow.number_of_students }}</div>
+                  <div>{{ actionedExam.number_of_students }}</div>
                 </div>
               </div>
             </div>
@@ -47,13 +47,13 @@
           <b-col cols="6" v-if="role_code !== 'GA' && !is_liaison_designate">
             <b-form-group>
               <label>Exam Time</label><br>
-              <b-input disabled :value="formatTime(examRow.booking.start_time)" />
+              <b-input disabled :value="formatTime(actionedExam.booking.start_time)" />
             </b-form-group>
           </b-col>
           <b-col cols="6" v-if="role_code !== 'GA' && !is_liaison_designate">
             <b-form-group>
               <label>Exam Date</label><br>
-              <b-input disabled :value="formatDate(examRow.booking.start_time)" />
+              <b-input disabled :value="formatDate(actionedExam.booking.start_time)" />
             </b-form-group>
           </b-col>
           <b-col cols="6" v-if="is_liaison_designate || role_code === 'GA'">
@@ -130,7 +130,7 @@
   export default {
     name: "EditGroupExamBookingModal",
     components: { DatePicker },
-    props: ['examRow', 'resetExam'],
+    props: ['actionedExam', 'resetExam'],
     data () {
       return {
         invigilator_id: '',
@@ -299,7 +299,7 @@
         })
       },
       setValues() {
-        let tempItem = Object.assign({}, this.examRow)
+        let tempItem = Object.assign({}, this.actionedExam)
         this.time = tempItem.booking.start_time
         this.date = tempItem.booking.start_time
         this.offsite_location = tempItem.offsite_location

@@ -24,7 +24,6 @@
                    :fields="fields"
                    sort-by="parrent.service_name"
                    :filter="filter"
-                   :tbody-tr-class="addcitizen-tr"
                    :small="t"
                    :bordered="f"
                    :striped="f"

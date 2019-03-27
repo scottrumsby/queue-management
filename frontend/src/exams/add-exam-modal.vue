@@ -114,9 +114,6 @@
   export default {
     name: 'AddExamModal',
     components: { AddExamFormController, AddExamFormConfirm },
-    mounted() {
-      this.captureExamDetail({key: 'exam_received_date', value: null})
-    },
     data() {
       return ({
         submitMsg: '',
@@ -229,7 +226,6 @@
           this.submitMsg = ''
           this.status = 'unknown'
           this.captureExamDetail({key: 'exam_method', value: 'paper'})
-          this.captureExamDetail({key:'notes', value: ''})
         }
         if (setup === 'challenger') {
           if (this.module.booking && this.module.booking.start) {

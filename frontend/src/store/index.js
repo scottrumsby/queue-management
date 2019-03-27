@@ -76,24 +76,16 @@ export const store = new Vuex.Store({
     dismissCount: 0,
     editedBooking: null,
     editedBookingOriginal: null,
-    editExamFailure: false,
-    editExams: [],
+    editExamFailureCount: 0,
     editedGroupBooking: null,
-    editExamSuccess: false,
+    editExamSuccessCount: 0,
     examAlertMessage: '',
-    examEditSuccessMessage: '',
-    examEditFailureMessage: '',
     examDismissCount: 0,
     examsTrackingIP: false,
     examSuccessDismiss : 0,
-    examMethods: [
-      {text: 'paper', value: 'paper', id: 'exam_method'},
-      {text: 'online', value: 'online', id: 'exam_method'}
-    ],
     exams: [],
     examTypes: [],
     feedbackMessage: '',
-    groupBookings: [],
     showGenFinReportModal: false,
     iframeLogedIn: false,
     invigilators: [],
@@ -102,7 +94,7 @@ export const store = new Vuex.Store({
       expiryFilter: 'current',
       scheduledFilter: 'both',
       groupFilter: 'both',
-      returnedFilter: 'notReturned',
+      returnedFilter: 'holding',
       office_number: 'default',
     },
     nowServing: false,
@@ -112,7 +104,6 @@ export const store = new Vuex.Store({
     offsiteVisible: false,
     performingAction: false,
     rescheduling: false,
-    returnExam: null,
     rooms: [],
     roomResources: [],
     scheduling: false,
@@ -146,7 +137,7 @@ export const store = new Vuex.Store({
     showSelectInvigilatorModal: false,
     showOtherBookingModal: false,
     showResponseModal: false,
-    showReturnExamModalVisible: false,
+    showReturnExamModal: false,
     showServiceModal: false,
     user: {
       csr_id: null,
@@ -1472,16 +1463,12 @@ export const store = new Vuex.Store({
       delete payload.exam_id
       return new Promise((resolve, reject) => {
         let url = `/exams/${id}/`
-        Axios(context).put(url, payload).then( resp =>{
-          resolve(resp)
-          context.commit('setEditExamSuccess', true)
-          context.commit('setExamEditSuccessMessage', 'Success! Exam changes were committed.')
-        })
-          .catch(error => {
-            context.commit('setEditExamFailure', true)
-            context.commit('setExamEditFailureMessage', 'There was a problem submitting changes to your exam.')
-            reject(error)
+        Axios(context).put(url, payload).then( () =>{
+          context.dispatch('getExams').then( () => {
+            context.commit('setEditExamSuccess', 6)
+            resolve()
           })
+        })
       })
     },
     
@@ -1510,7 +1497,6 @@ export const store = new Vuex.Store({
       context.commit('setEditedBooking', null)
       context.commit('toggleEditBookingModal', false)
       context.commit('toggleEditGroupBookingModal', false)
-      context.commit('toggleSelectInvigilatorModal', false)
     },
   
     postITAChallengerExam(context) {
@@ -2062,12 +2048,12 @@ export const store = new Vuex.Store({
       state.examDismissCount = 999
     },
   
-    setExamEditSuccessMessage(state, payload) {
-      state.examEditSuccessMessage = payload
+    setExamEditSuccessCount(state, payload) {
+      state.examEditSuccessCount = payload
     },
   
-    setExamEditFailureMessage(state, payload) {
-      state.examEditFailureMessage = payload
+    setExamEditFailureCount(state, payload) {
+      state.examEditFailCount = payload
     },
   
     setModalAlert(state, payload) {
@@ -2191,6 +2177,9 @@ export const store = new Vuex.Store({
       if (payload.key === 'event_id') {
         payload.value = payload.value.toString()
       }
+      if (payload.value === null) {
+        payload.value = ''
+      }
       Vue.set(
         state.capturedExam,
         payload.key,
@@ -2255,16 +2244,10 @@ export const store = new Vuex.Store({
   
     toggleEditExamModal: (state, payload) => state.showEditExamModal = payload,
   
-    toggleReturnExamModalVisible: (state, payload) => state.showReturnExamModalVisible = payload,
+    toggleReturnExamModal: (state, payload) => state.showReturnExamModal = payload,
   
     toggleDeleteExamModalVisible: (state, payload) => state.showDeleteExamModal = payload,
-  
-    setEditExamInfo: (state, payload) => state.editExams = payload,
-  
-    setReturnExamInfo: (state, payload) => state.returnExam = payload,
-  
-    setExamMethods: (state, payload) => state.examMethods = payload,
-  
+    
     setSelectedExam(state, payload) {
       if (payload === 'clearGoto') {
         delete state.selectedExam.gotoDate
@@ -2286,9 +2269,9 @@ export const store = new Vuex.Store({
   
     toggleOtherBookingModal: (state, payload) => state.showOtherBookingModal = payload,
   
-    setEditExamSuccess: (state, payload) => state.editExamSuccess = payload,
+    setEditExamSuccess: (state, payload) => state.editExamSuccessCount = payload,
   
-    setEditExamFailure: (state, payload) => state.editExamFailure = payload,
+    setEditExamFailure: (state, payload) => state.editExamFailureCount = payload,
   
     toggleEditBookingModal: (state, payload) => state.showEditBookingModal = payload,
   
@@ -2311,18 +2294,14 @@ export const store = new Vuex.Store({
     setOfficeFilter: (state, payload) => state.officeFilter = payload,
   
     setSelectionIndicator: (state, payload) => state.selectionIndicator = payload,
-  
-    setGroupBookings: (state, payload) => state.groupBookings = payload,
-  
+    
     setResources: (state, payload) => state.roomResources = payload,
-  
-    toggleSelectInvigilatorModal: (state, payload) => state.showSelectInvigilatorModal = payload,
   
     setEvents: (state, payload) => state.calendarEvents = payload,
   
     setInventoryEditedBooking(state, booking) {
       let bookingCopy = Object.assign({}, booking)
-      state.editedBooking = bookingCopy
+      state.editedBooking  = bookingCopy
     },
   
     toggleEditGroupBookingModal: (state, payload) => state.showEditGroupBookingModal = payload,

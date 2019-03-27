@@ -6,6 +6,7 @@
            @hidden="reset"
            @shown="populateForm"
            size="md">
+    <FailureExamAlert class="m-0 p-0" />
     <div v-if="exam">
       <b-table v-show="false"
                v-if="is_liaison_designate"
@@ -275,12 +276,12 @@
   import moment from 'moment'
   import Vue from 'vue'
   import DeleteExamModal from './delete-exam-modal'
+  import FailureExamAlert from './failure-exam-alert'
 
   export default {
     name: "EditExamModal",
-    components: { DatePicker,
-                  DeleteExamModal},
-    props: ['examRow', 'resetExam'],
+    components: { FailureExamAlert, DatePicker, DeleteExamModal },
+    props: ['actionedExam', 'resetExam'],
     data () {
       return {
         clickedMenu: false,
@@ -312,8 +313,8 @@
                    'showEditExamModal',
                    'showDeleteExamModal', ]),
       exam() {
-        if (Object.keys(this.examRow).length > 0) {
-          return this.examRow
+        if (Object.keys(this.actionedExam).length > 0) {
+          return this.actionedExam
         }
         return false
       },
@@ -415,19 +416,22 @@
     },
     methods: {
       ...mapActions(['getBookings', 'getExams', 'getOffices', 'putExamInfo',]),
-      ...mapMutations(['setEditExamFailure',
-                       'setEditExamSuccess',
-                       'setSelectedExam',
-                       'setReturnExamInfo',
-                       'setReturnDeleteExamInfo',
-                       'toggleEditExamModal',
-                       'toggleDeleteExamModalVisible']),
+      ...mapMutations([
+        'setEditExamFailure',
+        'setEditExamSuccess',
+        'setExamEditFailureMessage',
+        'setSelectedExam',
+        'setReturnExamInfo',
+        'setReturnDeleteExamInfo',
+        'toggleEditExamModal',
+        'toggleDeleteExamModalVisible'
+      ]),
       allowSubmit() {
-        if (this.examRow) {
+        if (this.actionedExam) {
           let fieldsEdited = false
           let fields = Object.keys(this.fields)
           for (let key of fields) {
-            if (this.fields[key] != this.examRow[key]) {
+            if (this.fields[key] != this.actionedExam[key]) {
               fieldsEdited = true
               this.showMessage = false
               break
@@ -525,8 +529,8 @@
         this.search = ''
       },
       populateForm() {
-        let exam = this.examRow
-        Object.keys(this.examRow).forEach( key => {
+        let exam = this.actionedExam
+        Object.keys(this.actionedExam).forEach( key => {
           if (typeof exam[key] === 'string' || typeof exam[key] === 'number') {
             Vue.set(
               this.fields,
@@ -580,17 +584,17 @@
           exam_id: this.fields.exam_id
         }
         Object.keys(this.fields).forEach( key => {
-          if (this.fields[key] != this.examRow[key]) {
+          if (this.fields[key] != this.actionedExam[key]) {
             putRequest[key] = this.fields[key]
           }
         })
-        if (!this.exam_received && this.examRow.exam_received_date) {
+        if (!this.exam_received && this.actionedExam.exam_received_date) {
           putRequest['exam_received_date'] = null
         }
         this.putExamInfo(putRequest).then( () => {
-          this.getExams()
-          this.setEditExamSuccess(true)
           this.toggleEditExamModal(false)
+        }).catch( () => {
+          this.setEditExamFailure(10)
         })
       },
       updateExamReceived(e) {

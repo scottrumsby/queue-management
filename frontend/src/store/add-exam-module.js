@@ -561,6 +561,9 @@ export const addExamModule = {
     },
     saveCapturedExam(state, payload) {
       Object.keys(payload).forEach(key => {
+        if (payload[key] === null) {
+          payload[key] = ''
+        }
         Vue.set(
           state.capturedExam,
           key,
