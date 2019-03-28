@@ -17,6 +17,7 @@ import Vuex from 'vuex'
 import moment from 'moment'
 import 'es6-promise/auto'
 import { addExamModule } from './add-exam-module'
+import appointmentsModule from './appointments-module'
 import { Axios, searchNestedObject } from './helpers'
 
 var flashInt
@@ -25,7 +26,7 @@ Vue.use(Vuex)
 
 export const store = new Vuex.Store({
   modules: {
-    addExamModule
+    addExamModule, appointmentsModule,
   },
   state: {
     addExamModal: {
@@ -739,16 +740,16 @@ export const store = new Vuex.Store({
 
     getServices(context) {
       let office_id = context.state.user.office_id
-      Axios(context).get(`/services/?office_id=${office_id}`)
-        .then( resp => {
-          let services = resp.data.services.filter(service => service.actual_service_ind === 1)
-          context.commit('setServices', services)
-        })
-        .catch(error => {
-          console.log('error @ store.actions.getServices')
-          console.log(error.response)
-          console.log(error.message)
-        })
+        Axios(context).get(`/services/?office_id=${office_id}`)
+          .then( resp => {
+            let services = resp.data.services.filter(service => service.actual_service_ind === 1)
+            context.commit('setServices', services)
+          })
+          .catch(error => {
+            console.log('error @ store.actions.getServices')
+            console.log(error.response)
+            console.log(error.message)
+          })
     },
 
     getUser(context) {

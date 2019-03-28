@@ -26,7 +26,7 @@
              @dismissed="dismissCountDown=0"
              @dismiss-count-down="countDownChanged">{{this.$store.state.alertMessage}}</b-alert>
     <div v-if="!minimizeWindow">
-      <div v-if="!this.addModalForm.citizen">
+      <div v-if="!this.addModalForm.citizen && !this.addModalForm.setup === 'add_mode'">
         <div class="q-loader" />
       </div>
       <div v-else>
@@ -53,8 +53,14 @@
               <span style="font: 400 16px Myriad-Pro;">Quick Txn</span>
             </b-form-checkbox>
           </div>
-          <div class="button-row">
+          <div class="button-row" v-if="$route.path !== '/appointments'">
             <Buttons />
+          </div>
+          <div class="button-row" v-else>
+            <b-button class="btn-success ml-3"
+                      @click="closeAddServiceModal">Add</b-button>
+            <b-button class="btn-danger"
+                      @click="closeAddServiceModal">Cancel</b-button>
           </div>
         </b-container>
       </div>
@@ -63,18 +69,18 @@
 </template>
 
 <script>
-import { mapState, mapGetters, mapMutations, mapActions } from "vuex"
-import Buttons from "./form-components/buttons"
-import AddCitizenForm from "./add-citizen-form"
+import { mapState, mapGetters, mapMutations, mapActions } from 'vuex'
+import Buttons from './form-components/buttons'
+import AddCitizenForm from './add-citizen-form'
 
 export default {
-  name: "AddCitizen",
+  name: 'AddCitizen',
   components: {
     AddCitizenForm,
     Buttons
   },
   mounted() {
-    this.$root.$on("showAddMessage", () => {
+    this.$root.$on('showAddMessage', () => {
       this.showAlert()
     })
   },
@@ -93,7 +99,7 @@ export default {
       addModalSetup: 'addModalSetup',
       serviceModalForm: 'serviceModalForm',
     }),
-    ...mapGetters({form_data: "form_data", reception: "reception",}),
+    ...mapGetters(['form_data', 'reception',]),
     simplified() {
       if (this.$route.path !== '/queue') {
         return true
@@ -101,20 +107,23 @@ export default {
       return false
     },
     modalTitle() {
-      if (this.addModalSetup === "edit_mode") {
-        return "Edit Service"
+      if (this.addModalSetup === 'edit_mode') {
+        return 'Edit Service'
+      }
+      if (this.$route.path === '/appointments') {
+        return 'Add a Service'
       }
       if (this.simplified) {
         return 'Begin Tracking'
       }
-      return "Add Citizen"
+      return 'Add Citizen'
     },
     quickTrans: {
       get() {
         return this.form_data.quick
       },
       set(value) {
-        this.updateAddModalForm({ type: "quick", value })
+        this.updateAddModalForm({ type: 'quick', value })
       }
     },
     priority_selection: {
@@ -122,29 +131,38 @@ export default {
         return this.form_data.priority
       },
       set(value) {
-        this.updateAddModalForm({ type: "priority", value })
+        this.updateAddModalForm({ type: 'priority', value })
       }
     }
   },
   methods: {
-    ...mapActions(["cancelAddCitizensModal"]),
-    ...mapMutations(["updateAddModalForm", "setDefaultChannel"]),
+    ...mapActions(['cancelAddCitizensModal']),
+    ...mapMutations([
+      'appointmentsModule/toggleApptBookingModal',
+      'updateAddModalForm',
+      'setDefaultChannel',
+      'toggleAddModal'
+    ]),
     countDownChanged(dismissCountDown) {
       this.dismissCountDown = dismissCountDown
+    },
+    closeAddServiceModal() {
+      this.toggleAddModal(false)
+      this[appointmentsModule/toggleApptBookingModal](true)
     },
     setupForm() {
       let setup = this.addModalSetup;
       if (this.simplified) {
-        this.$root.$emit("focusfilter")
+        this.$root.$emit('focusfilter')
         return
       }
-      if (setup === "add_mode" || setup === "edit_mode") {
-        this.$root.$emit("focusfilter")
+      if (setup === 'add_mode' || setup === 'edit_mode') {
+        this.$root.$emit('focusfilter')
       } else {
         if (!this.reception) {
-          this.$root.$emit("focusfilter")
+          this.$root.$emit('focusfilter')
         } else if (this.reception) {
-          this.$root.$emit("focuscomments")
+          this.$root.$emit('focuscomments')
         }
       }
     },

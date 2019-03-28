@@ -95,10 +95,7 @@
         ]
       },
       filter(value) {
-        if (!this.simplified) {
           return this.form_data.search
-        }
-        return 'Exams'
       },
     },
 
