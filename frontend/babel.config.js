@@ -5,14 +5,12 @@ module.exports = function(api) {
         [
           '@babel/preset-env',
           {
+            corejs: '3.0',
             targets: {
               node: 'current',
-              browsers: [
-                'last 5 Chrome versions'
-              ]
+              browsers: [ 'last 5 Chrome versions' ]
             },
             useBuiltIns: 'usage',
-            corejs: '3.0'
           }
         ]
       ]
@@ -23,6 +21,7 @@ module.exports = function(api) {
       [
         '@babel/preset-env',
         {
+          corejs: '3.0',
           modules: false,
           targets: {
             browsers: [
@@ -32,10 +31,8 @@ module.exports = function(api) {
             ]
           },
           useBuiltIns: 'usage',
-          corejs: '3.0'
         }
       ]
     ],
-    plugins: []
   }
 }

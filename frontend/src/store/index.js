@@ -61,7 +61,9 @@ export const store = new Vuex.Store({
     bookings: [],
     calendarEvents: [],
     calendarSetup: null,
-    capturedExam: {},
+    capturedExam: {
+      exam_type_id: null,
+    },
     captureITAExamTabSetup: {
       step: 1,
       highestStep: 1,
@@ -228,7 +230,7 @@ export const store = new Vuex.Store({
     },
     
     exam_object(state) {
-      if (state.capturedExam && state.capturedExam.exam_type_id) {
+      if (state.capturedExam && state.capturedExam.exam_type_id && state.examTypes) {
         return state.examTypes.find(type => type.exam_type_id == state.capturedExam.exam_type_id)
       }
       return {
@@ -1608,16 +1610,15 @@ export const store = new Vuex.Store({
         if (responses.on_or_off === 'off') {
           responses.offsite_location = '_offsite'
         }
-        delete responses.on_or_off
       }
-      
+      delete responses.on_or_off
       let defaultValues = {
         exam_returned_ind: 0,
         number_of_students: 1,
         office_id: context.state.user.office_id
       }
       if (context.state.addExamModal.setup === 'pesticide') {
-        defaultValues.office_id = responses['office_id']
+        delete defaultValues.office_id
       }
       responses.expiry_date = moment(responses.expiry_date).format('YYYY-MM-DD')
       if (responses.notes === null) {
@@ -1704,9 +1705,6 @@ export const store = new Vuex.Store({
       if (Object.keys(data).length === 0) {
         return new Promise((resolve, reject) => { resolve(' ') })
       }
-
-      console.log(citizen_id)
-      console.log(data)
       return new Promise((resolve, reject) => {
         let url = `/citizens/${citizen_id}/`
 
@@ -2199,9 +2197,6 @@ export const store = new Vuex.Store({
     },
   
     captureExamDetail(state, payload) {
-      if (payload.key === 'exam_type_id') {
-        payload.value = Number(payload.value)
-      }
       if (payload.key === 'event_id') {
         payload.value = payload.value.toString()
       }
@@ -2215,8 +2210,19 @@ export const store = new Vuex.Store({
       )
     },
   
-    resetCaptureForm(state) {
-      state.capturedExam = {}
+    resetCaptureForm({capturedExam, addExamModal}) {
+      Vue.set(
+        addExamModal,
+        office_number,
+        null
+      )
+      Object.keys(capturedExam).forEach(key => {
+        Vue.set(
+          capturedExam,
+          key,
+          null
+        )
+      })
     },
   
     resetCaptureTab(state) {
@@ -2346,6 +2352,13 @@ export const store = new Vuex.Store({
           payload.item[key]
         )
       })
+    },
+    
+    deleteCapturedExamKey: (state, payload) => {
+      Vue.delete(
+        state.addExamModal,
+        payload
+      )
     },
   
     toggleOffsiteVisible: (state, payload) => state.offsiteVisible = payload,
