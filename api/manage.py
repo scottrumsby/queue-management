@@ -344,25 +344,52 @@ class Bootstrap(Command):
         db.session.add(service_exams)
         db.session.commit()
 
+        print("--> Bookings: Timezones")
+
+        timezone_one = theq.Timezone(
+            timezone_name='America/Vancouver'
+        )
+
+        timezone_two = theq.Timezone(
+            timezone_name='America/Dawson_Creek'
+        )
+
+        timezone_three = theq.Timezone(
+            timezone_name='America/Edmonton'
+        )
+
+        timezone_four = theq.Timezone(
+            timezone_name='America/Creston'
+        )
+
+        db.session.add(timezone_one)
+        db.session.add(timezone_two)
+        db.session.add(timezone_three)
+        db.session.add(timezone_four)
+        db.session.commit()
+
         #-- Office values ---------------------------------------------------
         print("--> Offices")
         office_test = theq.Office(
             office_name="Test Office",
             office_number=999,
             sb_id=smartboard_call_ticket.sb_id,
-            exams_enabled_ind=1
+            exams_enabled_ind=1,
+            timezone_id=timezone_one.timezone_id
         )
         office_100 = theq.Office(
             office_name="100 Mile House",
             office_number=1,
             sb_id=smartboard_no_call.sb_id,
-            exams_enabled_ind=0
+            exams_enabled_ind=0,
+            timezone_id=timezone_one.timezone_id
         )
         office_victoria = theq.Office(
             office_name="Victoria",
             office_number=61,
             sb_id=smartboard_call_name.sb_id,
-            exams_enabled_ind=0
+            exams_enabled_ind=0,
+            timezone_id=timezone_one.timezone_id
         )
         db.session.add(office_test)
         db.session.add(office_100)
@@ -850,30 +877,6 @@ class Bootstrap(Command):
         db.session.add(exam_three)
         db.session.add(exam_four)
         db.session.add(exam_five)
-        db.session.commit()
-
-        print("--> Bookings: Timezones")
-
-        timezone_one = theq.Timezone(
-            timezone_name='America/Vancouver'
-        )
-
-        timezone_two = theq.Timezone(
-            timezone_name='America/Dawson_Creek'
-        )
-
-        timezone_three = theq.Timezone(
-            timezone_name='America/Edmonton'
-        )
-
-        timezone_four = theq.Timezone(
-            timezone_name='America/Creston'
-        )
-
-        db.session.add(timezone_one)
-        db.session.add(timezone_two)
-        db.session.add(timezone_three)
-        db.session.add(timezone_four)
         db.session.commit()
 
         start_time = datetime(2019, 3, 28, 9, 0, 0)

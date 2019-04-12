@@ -319,11 +319,9 @@
           }
           let start
           if (local_timezone_name !== edit_timezone_name) {
-            console.log('different time zones')
             start =  zone.tz(`${baseDate}T${baseTime}`, edit_timezone_name)
           }
           if (local_timezone_name === edit_timezone_name) {
-            console.log('same time zones')
             start = moment(`${baseDate}T${baseTime}`)
           }
           let end = start.clone().add(parseInt(this.itemCopy.exam_type.number_of_hours), 'h')
@@ -339,7 +337,6 @@
               bookingChanges.sbc_staff_invigilated = false
             }
           }
-          console.log(bookingChanges)
           putRequests.push({url:`/bookings/${this.itemCopy.booking.booking_id}/`, data: bookingChanges})
         }
         let examChanges = {}

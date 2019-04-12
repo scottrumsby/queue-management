@@ -169,7 +169,6 @@
         this.notes = tempValues.notes
         this.exam_returned_tracking_number = tempValues.exam_returned_tracking_number
         if (tempValues.exam_returned_date) {
-          console.log('twas true')
           this.modalUse = 'edit'
           this.returned = true
           this.exam_returned_date = tempValues.exam_returned_date

@@ -171,34 +171,14 @@
     },
     methods: {
       ...mapActions(['clickAddExamSubmit', 'getExams', 'actionWipeAllSavedModals']),
-      ...mapMutations(['captureExamDetail', 'resetCaptureForm', 'resetCaptureTab', 'setAddExamModalSetting', 'updateCaptureTab', ]),
-      tabWarning(i) {
-        if (!Array.isArray(this.errors)) return ''
-        if (this.errors.length > 0) {
-          let list = []
-            this.errors.forEach(error=>{
-              if (this.steps.some(step=>step.step==error)) {
-                list.push(this.steps.find(step=>step.step==error)).questions
-              }
-            })
-          if (list.includes(i)) {
-            return {color: 'red'}
-          }
-          return ''
-        }
-        return ''
-      },
-      tabValidate(i) {
-        if (this.validated().indexOf(i) === -1) {
-          return false
-        }
-        return true
-      },
-      logAnother() {
-        this.actionWipeAllSavedModals()
-        this.resetModal()
-        this.initialize()
-      },
+      ...mapMutations([
+        'captureExamDetail',
+        'deleteCapturedExamKey',
+        'resetCaptureForm',
+        'resetCaptureTab',
+        'setAddExamModalSetting',
+        'updateCaptureTab',
+      ]),
       clickBack() {
         let step = this.step - 1
         this.updateCaptureTab({step})
@@ -217,6 +197,11 @@
       },
       clickTab(e) {
         this.updateCaptureTab({step: e})
+      },
+      filterKeyPress(e) {
+        if (e.keyCode === 13) {
+          e.preventDefault()
+        }
       },
       initialize() {
         document.addEventListener('keydown', this.filterKeyPress)
@@ -268,17 +253,37 @@
           this.captureExamDetail({ key: 'expiry_date', value })
         }
         if (setup === 'pesticide') {
+          let { exam_type_id } = this.examTypes.find(e => e.pesticide_exam_ind === 1 && e.group_exam_ind === 0)
+          this.captureExamDetail({ key: 'exam_type_id', value: exam_type_id})
           let value = moment().add(60, 'd')
           this.captureExamDetail({ key: 'expiry_date', value })
+          this.setAddExamModalSetting({office_number: null})
+          this.$root.$emit('validateform')
         }
       },
-      tryAgain() {
-        this.unSubmitted = true
-        this.status = 'unknown'
+      logAnother() {
+        this.actionWipeAllSavedModals()
+        this.resetModal()
+        this.initialize()
       },
-      filterKeyPress(e) {
-        if (e.keyCode === 13) {
-          e.preventDefault()
+      resetModal() {
+        document.removeEventListener('keydown', this.filterKeyPress)
+        if (this.addExamModal.setup !== 'challenger') {
+          this.resetCaptureForm()
+          this.resetCaptureTab()
+          return
+        }
+        if (this.addExamModal.setup === 'challenger' && this.capturedExam && this.capturedExam.on_or_off !== 'on') {
+          this.resetCaptureForm()
+          this.resetCaptureTab()
+          this.actionWipeAllSavedModals()
+          return
+        }
+      },
+      setWarning() {
+        if (!this.errors.includes(this.step)) {
+          let errors = this.errors.concat([this.step])
+          this.updateCaptureTab({errors})
         }
       },
       submit() {
@@ -306,32 +311,40 @@
         if (setup === 'individual' || setup === 'other' || setup === 'pesticide') {
           this.clickAddExamSubmit('individual').then( resp => {
             this.status = resp
+            this.deleteCapturedExamKey('office_number')
             this.getExams()
+
           }).catch( error => {
             this.status = error
             this.getExams()
           })
         }
       },
-      resetModal() {
-        document.removeEventListener('keydown', this.filterKeyPress)
-        if (this.addExamModal.setup !== 'challenger') {
-          this.resetCaptureForm()
-          this.resetCaptureTab()
-          return
+      tabValidate(i) {
+        if (this.validated().indexOf(i) === -1) {
+          return false
         }
-        if (this.addExamModal.setup === 'challenger' && this.capturedExam && this.capturedExam.on_or_off !== 'on') {
-          this.resetCaptureForm()
-          this.resetCaptureTab()
-          this.actionWipeAllSavedModals()
-          return
-        }
+        return true
       },
-      setWarning() {
-        if (!this.errors.includes(this.step)) {
-          let errors = this.errors.concat([this.step])
-          this.updateCaptureTab({errors})
+      tabWarning(i) {
+        if (!Array.isArray(this.errors)) return ''
+        if (this.errors.length > 0) {
+          let list = []
+            this.errors.forEach(error=>{
+              if (this.steps.some(step=>step.step==error)) {
+                list.push(this.steps.find(step=>step.step==error)).questions
+              }
+            })
+          if (list.includes(i)) {
+            return {color: 'red'}
+          }
+          return ''
         }
+        return ''
+      },
+      tryAgain() {
+        this.unSubmitted = true
+        this.status = 'unknown'
       },
       validated() {
         if (this.tab && this.tab.stepsValidated) {
