@@ -370,7 +370,7 @@
             this.invigilator_id = tempItem.booking.invigilator_id
           }
         }
-        this.offsite_location = tempItem.offsite_location
+        this.offsite_location = tempItem.offsite_location === '_offsite' ? '' : tempItem.offsite_location
         this.editedFields = []
         this.itemCopy = tempItem
       },

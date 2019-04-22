@@ -233,9 +233,8 @@
           return
           }
         reset()
-        if (setup == 'individual') {
-          let d = new Date()
-          let today = moment(d).format('YYYY-MM-DD')
+        if (setup == 'individual' || setup) {
+          let today = moment().format('YYYY-MM-DD')
           this.captureExamDetail({ key: 'exam_received_date', value: today })
           let value = moment().add(90, 'd')
           this.captureExamDetail({ key: 'expiry_date', value })
@@ -287,38 +286,15 @@
         }
       },
       submit() {
-        let { setup } = this.addExamModal
         this.unSubmitted = false
         this.submitMsg = ''
-        if (setup === 'group') {
-          this.clickAddExamSubmit(setup).then( resp => {
-            this.status = resp
-            this.getExams()
+        this.clickAddExamSubmit().then( resp => {
+          this.status = resp
+          this.getExams()
           }).catch( error => {
             this.status = error
             this.getExams()
           })
-        }
-        if (setup === 'challenger') {
-          this.clickAddExamSubmit(setup).then( resp => {
-            this.status = resp
-            this.getExams()
-          }).catch( error => {
-            this.status = error
-            this.getExams()
-          })
-        }
-        if (setup === 'individual' || setup === 'other' || setup === 'pesticide') {
-          this.clickAddExamSubmit('individual').then( resp => {
-            this.status = resp
-            this.deleteCapturedExamKey('office_number')
-            this.getExams()
-
-          }).catch( error => {
-            this.status = error
-            this.getExams()
-          })
-        }
       },
       tabValidate(i) {
         if (this.validated().indexOf(i) === -1) {
