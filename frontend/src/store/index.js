@@ -912,20 +912,23 @@ export const store = new Vuex.Store({
       })
     },
 
-    clickAddExamSubmit(context, type) {
+    clickAddExamSubmit({commit, dispatch, state}) {
+      let { setup } = state.addExamModal
       return new Promise((resolve, reject) => {
-        if (type === 'challenger') {
-          context.dispatch('postITAChallengerExam').then(() => {
+        console.log(setup)
+        if (setup === 'challenger') {
+          dispatch('postITAChallengerExam').then(() => {
             resolve('success')
           }).catch(() => { reject('failed') })
         }
-        if (type === 'group') {
-          context.dispatch('postITAGroupExam').then(() => {
+        if (setup === 'group') {
+          dispatch('postITAGroupExam').then(() => {
             resolve('success')
           }).catch(() => { reject('failed') })
         }
-        if (type === 'individual') {
-          context.dispatch('postITAIndividualExam').then(() => {
+        if (setup === 'individual' || setup === 'other' || setup === 'pesticide') {
+          commit('deleteCapturedExamKey', 'office_number')
+          dispatch('postITAIndividualExam').then(() => {
             resolve('success')
           }).catch(() => { reject('failed') })
         }
@@ -1510,8 +1513,8 @@ export const store = new Vuex.Store({
       let booking = {
         start_time: start.clone().utc().format('YYYY-MM-DD[T]HH:mm:ssZ'),
         end_time: end.clone().utc().format('YYYY-MM-DD[T]HH:mm:ssZ'),
-        fees: 'false',
-        booking_name: 'Monthly Session',
+        fees: "false",
+        booking_name: responses.exam_name,
         office_id: context.state.user.office_id,
       }
       if (responses.on_or_off === 'on') {
@@ -1535,7 +1538,7 @@ export const store = new Vuex.Store({
         data.notes = ''
       }
       let postData = {...responses, ...defaultValues}
-     
+      console.log(postData)
       return new Promise((resolve, reject) => {
         Axios(context).post('/exams/', postData).then( examResp => {
           let { exam_id } = examResp.data.exam
@@ -1605,13 +1608,14 @@ export const store = new Vuex.Store({
     },
   
     postITAIndividualExam(context) {
+      console.log('got this far')
       let responses = Object.assign( {}, context.state.capturedExam)
-      if (responses.on_or_off) {
+      if (Object.keys(responses).includes('on_or_off')) {
         if (responses.on_or_off === 'off') {
           responses.offsite_location = '_offsite'
         }
+        delete responses.on_or_off
       }
-      delete responses.on_or_off
       let defaultValues = {
         exam_returned_ind: 0,
         number_of_students: 1,
@@ -1629,8 +1633,8 @@ export const store = new Vuex.Store({
           delete responses.exam_received_date
         }
       }
-      let postData = {...responses, ...defaultValues}
-  
+      let postData = { ...responses, ...defaultValues }
+      console.log(postData)
       return new Promise((resolve, reject) => {
         Axios(context).post('/exams/', postData).then( () => { resolve() }).catch( () => { reject() })
       })
