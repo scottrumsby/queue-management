@@ -43,13 +43,13 @@
                 <option value="3">Low Priority</option>
               </select>
             </div>
-            <select v-show="reception && !simplified" id="counter-selection" class="custom-select" v-model="counter_selection">
-              <option v-for="counter in sortedCounters"
-                    :value="counter.counter_id"
-                    :key="counter.counter_id">
-                {{counter.counter_name}}
+            <!--   <select v-show="reception && !simplified" id="counter-selection" class="custom-select" v-model="counter_selection">
+               <option v-for="counter in sortedCounters"
+                      :value="counter.counter_id"
+                      :key="counter.counter_id">
+                  {{counter.counter_name}
               </option>
-            </select>
+            </select>}-->
           </div>
           <div class="button-row">
             <Buttons />

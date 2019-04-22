@@ -36,11 +36,11 @@ limitations under the License.*/
       <div id="select-wrapper" style="padding-right: 20px" v-if="reception">
         <select id="counter-selection" class="custom-select" v-model="counter_selection">
             <option value='receptionist'>Receptionist</option>
-            <option v-for="counter in user.office.counters"
+           <!-- <option v-for="counter in user.office.counters"
                   :value="counter.counter_id"
                   :key="counter.counter_id">
             {{counter.counter_name}}
-          </option>
+          </option>-->
         </select>
       </div>
       <div style="padding-right: 20px">
@@ -70,8 +70,8 @@ import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
     computed: {
       ...mapState(['user', 'csr_states']),
       ...mapGetters(['quick_trans_status', 'reception', 'receptionist_status']),
-      
-      counter_selection: {
+
+     /* counter_selection: {
         get() {
           console.log(this.receptionist_status)
           if (this.receptionist_status === true) {
@@ -89,7 +89,7 @@ import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
           }
           this.updateCSRCounterTypeState()
         }
-      },
+      },*/
       break_toggle: {
         get() {
             var csr_status = this.user.csr_state.csr_state_name

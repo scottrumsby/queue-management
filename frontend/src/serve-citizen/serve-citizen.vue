@@ -74,13 +74,14 @@
         <b-row no-gutters>
           <b-col cols="7" />
           <b-col cols="auto" style="align: right">
-            <select id="counter-selection" v-show="reception && !simplifiedModal" class="custom-select" v-model="counter_selection">
+          <!--  <select id="counter-selection" v-show="reception && !simplifiedModal" class="custom-select"
+                     v-model="counter_selection">
               <option v-for="counter in user.office.counters"
                     :value="counter.counter_id"
                     :key="counter.counter_id">
                 {{counter.counter_name}}
               </option>
-            </select>
+            </select>-->
             <select id="priority-selection" class="custom-select" v-model="priority_selection" style="margin-right:8px;">
                 <option value=1>High Priority</option>
                 <option value=2>Default Priority</option>

@@ -25,9 +25,9 @@ limitations under the License.*/
              @row-clicked="rowClicked"
              class="p-0 m-0">
              <!--id="client-waiting-table"-->
-      <template slot='counter_id' slot-scope='data'>
+   <!--   <template slot='counter_id' slot-scope='data'>
         {{ showCounter(data.item.counter_id) }}
-      </template>
+      </template>-->
       <template slot='start_time' slot-scope='data'>
         {{ formatTime(data.item.start_time) }}
       </template>
@@ -76,7 +76,7 @@ limitations under the License.*/
       getFields: function() {
         if (this.reception) {
           let temp = this.fields
-          temp.unshift({key: 'counter_id', label: 'Counter', sortable: false, thStyle: 'width: 8%'})
+        //  temp.unshift({key: 'counter_id', label: 'Counter', sortable: false, thStyle: 'width: 8%'})
           temp.unshift({key: 'priority', label: 'Priority', sortable: false, thStyle: 'width: 8%'})
           return temp
         }
@@ -111,13 +111,13 @@ limitations under the License.*/
         let n = service.periods.findIndex(p => p.time_end === null)
         return service.periods[n].csr.username
       },
-      showCounter(value) {
+     /* showCounter(value) {
         for(let i = 0; i < this.user.office.counters.length; i++){
           if(this.user.office.counters[i].counter_id == value){
             return this.user.office.counters[i].counter_name
           }
         }
-      },
+      },*/
       showCategory(id) {
         let service = this.active_service_id(id)
         if (!service) {
