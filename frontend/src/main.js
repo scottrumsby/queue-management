@@ -17,7 +17,7 @@ import 'es6-promise/auto'
 import { store } from './store/'
 import BootstrapVue from 'bootstrap-vue'
 import Router from './router'
-import Fragment from 'vue-fragment'
+import { Plugin } from 'vue-fragment'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import {
   faAngleLeft,
@@ -31,15 +31,21 @@ import {
   faCheckSquare,
   faClipboardCheck,
   faClock,
-  faShippingFast,
+  faDollarSign,
+  faEraser,
   faExclamation,
   faExclamationTriangle,
+  faFileAlt,
   faFilter,
   faLifeRing,
   faMinus,
   faPlus,
+  faShippingFast,
   faSort,
   faStopwatch,
+  faTrashAlt,
+  faUserAlt,
+  faUserCircle,
   faWindowMaximize,
   faWindowRestore,
 } from '@fortawesome/free-solid-svg-icons'
@@ -54,28 +60,34 @@ require('es6-shim')
 require('Keycloak')
 
 Vue.use(VDragged)
-Vue.use(Fragment.Plugin)
+Vue.use(Plugin)
 library.add(
-  faClock,
   faAngleLeft,
   faAngleRight,
   faBars,
   faCalendar,
+  faCaretDown,
   faCaretLeft,
   faCaretRight,
-  faCaretDown,
   faCheck,
   faCheckSquare,
   faClipboardCheck,
-  faShippingFast,
+  faClock,
+  faDollarSign,
+  faEraser,
   faExclamation,
   faExclamationTriangle,
+  faFileAlt,
   faFilter,
   faLifeRing,
   faMinus,
   faPlus,
+  faShippingFast,
   faSort,
   faStopwatch,
+  faTrashAlt,
+  faUserAlt,
+  faUserCircle,
   faWindowMaximize,
   faWindowRestore,
 )
