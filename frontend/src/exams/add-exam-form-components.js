@@ -331,6 +331,67 @@ export const InputQuestion = Vue.component('input-question', {
   `
 })
 
+export const InputQuestion2 = Vue.component('input-question-2', {
+  props: ['error', 'q', 'validationObj', 'handleInput', 'exam'],
+  components: { checkmark },
+  data() {
+    return {
+      options: [
+        {text: 'No', value: false},
+        {text: 'Yes', value: true}
+      ]
+    }
+  },
+  computed: {
+    ...mapState({
+      setup: state => state.addExamModal.setup
+    }),
+    capture_names: {
+      get() {
+        return this.exam.capture_names
+      }, set(value) {
+        this.$store.commit('captureExamDetail', {key: 'capture_names', value})
+      }
+    }
+  },
+  methods: {
+    preHandleInput(e) {
+      this.handleInput(e)
+    },
+  },
+  template: `
+    <fragment>
+      <b-row no-gutters>
+        <b-col cols="5">
+          <label>{{q.text}}
+              <span v-if="error" style="color: red">{{ validationObj[q.key].message }}</span>
+          </label>
+        </b-col>
+        <b-col cols="6">
+          <label>Add Candidate Names Now?</label>
+        </b-col>
+      </b-row>
+      <b-row no-gutters class="mb-1">
+        <b-col cols="5"><b-form-input :value="exam[q.key]"
+                          :name="q.key"
+                          :key="q.key"
+                          size="sm"
+                          :id="q.key"
+                          autocomplete="off"
+                          @input.native="preHandleInput" />
+        </b-col>
+        <b-col cols="6">
+          <b-form-select size="sm"
+                         style="height: 31px"
+                         :options="options"
+                         v-model="capture_names" />
+        </b-col>
+        <checkmark v-if="setup !=='challenger' " :validated="validationObj[q.key].valid"  />
+      </b-row>
+    </fragment>
+  `
+})
+
 export const LocationInput = Vue.component('input-question', {
   props: ['error', 'q', 'validationObj', 'handleInput', 'exam'],
   components: { checkmark },
@@ -465,34 +526,6 @@ export const LocationInput = Vue.component('input-question', {
   `
 })
 
-export const SelectQuestion = Vue.component('select-question', {
-  props: ['error', 'q', 'validationObj', 'handleInput', 'exam'],
-  components: { checkmark },
-  computed: {
-    ...mapState({
-      addExamModal: state => state.addExamModal,
-    }),
-  },
-  template: `
-    <b-row no-gutters>
-      <b-col cols="11">
-        <b-form-group>
-          <label>{{q.text}}
-            <span v-if="error" style="color: red">{{ validationObj[q.key].message }}</span>
-          </label><br>
-          <b-form-select :options="q.options"
-                         :value="exam[q.key]"
-                         autocomplete="off"
-                         @change.native="handleInput"
-                         :class="addExamModal.setup === 'group' ? 'w-50' : '' "
-                         :name="q.key" />
-        </b-form-group>
-      </b-col>
-      <checkmark :validated="validationObj[q.key].valid"  />
-    </b-row>
-  `,
-})
-
 export const NotesQuestion = Vue.component('notes-question', {
   props: ['error', 'q', 'validationObj', 'handleInput', 'exam'],
   components: { checkmark },
@@ -565,6 +598,48 @@ export const OffsiteSelect = Vue.component('offsite-select', {
         </b-form-group>
       </b-col>
       <checkmark :validated="validationObj[q.key].valid" />
+    </b-row>
+  `,
+})
+
+export const SelectQuestion = Vue.component('select-question', {
+  props: ['error', 'q', 'validationObj', 'handleInput', 'exam'],
+  components: { checkmark },
+  computed: {
+    ...mapState({
+      addExamModal: state => state.addExamModal,
+      capturedExam: 'capturedExam'
+    }),
+    ind_or_group() {
+      if (this.capturedExam.ind_or_group) {
+        return this.capturedExam.ind_or_group
+      }
+      return null
+    },
+  },
+  watch: {
+    ind_or_group(newVal, oldVal) {
+      if (this.addExamModal.setup === 'pesticide' && newVal === 'group') {
+        this.$store.commit('captureExamDetail', {key: 'capture_names', value: false})
+      }
+    }
+  },
+  template: `
+    <b-row no-gutters>
+      <b-col cols="11">
+        <b-form-group>
+          <label>{{q.text}}
+            <span v-if="error" style="color: red">{{ validationObj[q.key].message }}</span>
+          </label><br>
+          <b-form-select :options="q.options"
+                         :value="exam[q.key]"
+                         autocomplete="off"
+                         @change.native="handleInput"
+                         :class="addExamModal.setup === 'group' ? 'w-50' : '' "
+                         :name="q.key" />
+        </b-form-group>
+      </b-col>
+      <checkmark :validated="validationObj[q.key].valid"  />
     </b-row>
   `,
 })

@@ -16,6 +16,12 @@
                      :validationObj="validationObj"
                      :handleInput="handleInput"
                      :exam="exam" />
+      <InputQuestion2 v-if="q.kind==='number_of_candidates'"
+                     :error="error"
+                     :q="q"
+                     :validationObj="validationObj"
+                     :handleInput="handleInput"
+                     :exam="exam" />
       <LocationInput v-if="q.kind==='locationInput'"
                      v-show="addExamModal.setup !== 'other' || q.key !== 'event_id'"
                      :error="error"
@@ -35,6 +41,19 @@
                       :validationObj="validationObj"
                       :handleInput="handleInput"
                       :exam="exam" />
+      <GroupExamsInput v-if="q.kind==='group_exam_types'"
+                       :error="error"
+                       :q="q"
+                       :validationObj="validationObj"
+                       :handleInput="handleInput"
+                       :exam="exam" />
+      <GroupNamesInput v-if="q.kind==='group_name_input'"
+                      :error="error"
+                      :q="q"
+                      :validationObj="validationObj"
+                      :handleInput="handleInput"
+                      :exam="exam" />
+      <!--see watcher in SelectQuestion of add-exam-form-components.js for GroupNamesInput default behaviour-->
       <SelectOffice v-if="q.kind==='office'"
                     v-show="is_liaison_designate || is_pesticide_designate"
                     :error="error"
@@ -79,16 +98,19 @@
   import {
     checkmark,
     DateQuestion,
-    TimeQuestion,
     DropdownQuestion,
     ExamReceivedQuestion,
-    LocationInput,
-    OffsiteSelect,
     InputQuestion,
+    InputQuestion2,
+    LocationInput,
     NotesQuestion,
+    OffsiteSelect,
+    SelectOffice,
     SelectQuestion,
-    SelectOffice
+    TimeQuestion,
   } from './add-exam-form-components.js'
+  import GroupNamesInput from './form-components/group-names-input'
+  import GroupExamsInput from './form-components/group-exams-input'
   import moment from 'moment'
 
   export default {
@@ -98,13 +120,16 @@
       DateQuestion,
       DropdownQuestion,
       ExamReceivedQuestion,
+      GroupExamsInput,
+      GroupNamesInput,
       InputQuestion,
       LocationInput,
-      OffsiteSelect,
-      TimeQuestion,
+      InputQuestion2,
       NotesQuestion,
+      OffsiteSelect,
+      SelectOffice,
       SelectQuestion,
-      SelectOffice
+      TimeQuestion,
     },
     mounted() {
       this.getExamTypes()
@@ -137,11 +162,11 @@
         addChallengerSteps: state => state.addExamModule.addChallengerSteps,
         addIndividualSteps: state => state.addExamModule.addIndividualSteps,
         addOtherSteps: state => state.addExamModule.addOtherSteps,
-        addPesticideSteps: state => state.addExamModule.addPesticideSteps,
         tab: state => state.captureITAExamTabSetup,
         examTypes: state => state.examTypes,
         user: state => state.user,
       }),
+      ...mapGetters(['addPesticideSteps']),
       error() {
         if (this.errors.includes(this.step)) {
           return true

@@ -17,7 +17,7 @@ import 'es6-promise/auto'
 import { store } from './store/'
 import BootstrapVue from 'bootstrap-vue'
 import Router from './router'
-import Fragment from 'vue-fragment'
+import { Plugin } from 'vue-fragment'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import {
   faAngleLeft,
@@ -54,7 +54,7 @@ require('es6-shim')
 require('Keycloak')
 
 Vue.use(VDragged)
-Vue.use(Fragment.Plugin)
+Vue.use(Plugin)
 library.add(
   faClock,
   faAngleLeft,

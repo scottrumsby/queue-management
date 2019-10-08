@@ -7,6 +7,118 @@
            hide-cancel
            @shown="initialize"
            @hidden="hideModal"
+           size="lg">
+    Wzsoipj
+    <template slot="modal-footer">
+      <template v-if="unSubmitted">
+        <div v-if="step < lastStep"
+             style="width: 100%;
+                    display: flex;
+                    justify-content: space-between">
+          <div>
+            <b-button @click="clickCancel">Cancel</b-button>
+          </div>
+          <div style="display: inline">
+            <b-button v-if="step > 1"
+                      class="btn-secondary mr-2"
+                      @click="clickBack">Back</b-button>
+            <b-button v-if="button.nextDisabled"
+                      :class="button.nextClass"
+                      @click="setWarning"
+                      id="add_exam_next">Next</b-button>
+            <b-button v-else
+                      :class="button.nextClass"
+                      @click="clickNext"
+                      id="add_exam_next">Next</b-button>
+          </div>
+        </div>
+        <div v-else-if="step == lastStep"
+             style="display: flex;
+                    justify-content: space-between;
+                    width: 100%">
+          <div style="display: inline">
+            <b-button class="btn-secondary"
+                      @click="clickCancel">Cancel</b-button>
+          <b-button class="btn-warning"
+                    @click="logAnother">Start Again</b-button>
+          </div>
+          <div style="display: flex">
+            <b-button v-if="errors.length > 0"
+                      @click="submitMsg='You have an error on a previous step.  Click on the red tab.'"
+                      class="btn-primary disabled"
+                      id="add_exam_submit">Submit</b-button>
+            <b-button v-else
+                      class="btn-primary"
+                      @click.once="submit"
+                      id="add_exam_submit">Submit</b-button>
+          </div>
+        </div>
+      </template>
+      <template v-if="!unSubmitted">
+        <div style="display: flex; justify-content: flex-start">
+          <b-button class="btn-secondary"
+                    @click="clickCancel"
+                    id="add_exam_submit_close">Close</b-button>
+        </div>
+      </template>
+    </template>
+
+    <b-nav tabs class="mb-3">
+      <b-nav-item v-for="i in tabs"
+                  :key="'tab '+i.title"
+                  :active="tabs[step-1].title==i.title"
+                  @click="clickTab(i.step)">
+        <span :style="tabWarning(i)">{{ i.title }}
+        <font-awesome-icon v-if="tabValidate(i.step)"
+                           icon="check"
+                           class="m-0 p-0"
+                           style="font-size: .8rem; color: green"/>
+        </span>
+      </b-nav-item>
+    </b-nav>
+    <template v-if="unSubmitted">
+      <AddExamFormController v-if="step <= (lastStep - 1)"  />
+      <AddExamFormConfirm v-if="step==lastStep" :submitMsg="submitMsg" />
+    </template>
+    <template v-if="!unSubmitted">
+      <div v-if="status==='unknown' "
+           class="loader" style="margin-top: auto"></div>
+      <div v-if="status==='success'">
+        <b-container>
+          <b-row align-v="center"
+                 align-h="center"
+                 align-content="center">
+            <b-col>
+              <p><h5>Success.  Exam Details Added.</h5></p>
+              <p><b-button @click="logAnother" class="btn-primary">Log Another Exam</b-button></p>
+            </b-col>
+          </b-row>
+        </b-container>
+      </div>
+      <div v-if="status==='failed'">
+        <b-container>
+          <b-row align-v="center"
+                 align-h="center"
+                 align-content="center">
+            <b-col>
+              <p class="message-text">Something Went Wrong</p>
+              <p><b-button @click="tryAgain">Try Again</b-button></p>
+            </b-col>
+          </b-row>
+        </b-container>
+      </div>
+    </template>
+  </b-modal>
+</template>
+<template>
+  <b-modal v-model="modalVisible"
+           :no-close-on-backdrop="true"
+           id="add-exam-modal"
+           hide-ok
+           hide-header
+           hide-cancel
+           @shown="initialize"
+           @hidden="hideModal"
            size="md">
     <template slot="modal-footer">
       <template v-if="unSubmitted">
@@ -167,6 +279,10 @@
         }
         return 1
       },
+      setup() {
+        if (this.addExamModal && this.addExamModal.setup) return this.addExamModal.setup
+        return ''
+      },
       tabs() {
         if (this.steps && Array.isArray(this.steps)) {
           return this.steps.slice(0, this.tab.highestStep)
@@ -205,6 +321,7 @@
       filterKeyPress(e) {
         if (e.keyCode === 13) {
           e.preventDefault()
+          return e
         }
       },
       hideModal() {
