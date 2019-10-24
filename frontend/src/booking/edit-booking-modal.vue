@@ -10,7 +10,7 @@
            @ok="submit"
            :hide-footer="confirm"
            hide-header
-           :size="confirm && !minimized ? 'sm' : 'md'">
+           size="lg">
     <div v-if="event && showModal" style="margin: 10px">
       <div v-if="minimized || !confirm" style="display: flex; justify-content: space-between">
         <div><h5>Edit Booking</h5></div>
@@ -78,7 +78,7 @@
           <b-form-row>
             <b-col>
               <b-form-group>
-                <label>Contact Information (Email or Phone Number)</label><br>
+                <label>Name</label><br>
                 <b-input autocomplete="off"
                          id="contact_information"
                          type="text"
@@ -86,15 +86,31 @@
                          v-model="booking_contact_information"/>
               </b-form-group>
             </b-col>
+            <b-col>
+              <b-form-group>
+                <label>Email</label><br>
+                <b-input autocomplete="off"
+                         id="contact_information"
+                         type="text"
+                         @change.native="checkValue"
+                         v-model="booking_contact_information" />
+              </b-form-group>
+            </b-col>
           </b-form-row>
           <b-form-row>
-            <b-col cols="6">
+            <b-col>
+              <b-form-group>
+                <label>Phone</label>
+                <b-input />
+              </b-form-group>
+            </b-col>
+            <b-col>
               <b-form-group>
                 <label>Room</label>
                 <b-input readonly :value="resource.name" />
               </b-form-group>
             </b-col>
-            <b-col cols="6">
+            <b-col>
               <b-form-group>
                 <label>Date</label>
                 <b-input readonly :value="displayDates.date" />

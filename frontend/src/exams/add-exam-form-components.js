@@ -192,12 +192,12 @@ export const ExamReceivedQuestion = Vue.component('exam-received-question', {
     return {
       date: null,
       options: [
-        {text: 'Yes', value: true},
-        {text: 'No', value: false}
+        { text: 'Yes', value: true },
+        { text: 'No', value: false }
       ],
       otherOptions: [
-        {text: 'No', value: true},
-        {text: 'Yes', value: false}
+        { text: 'No', value: true },
+        { text: 'Yes', value: false }
       ]
     }
   },
@@ -213,7 +213,7 @@ export const ExamReceivedQuestion = Vue.component('exam-received-question', {
       }
     },
     modalSetup() {
-      if (this.addExamModal && this.addExamModal.setup) {
+      if ( this.addExamModal && this.addExamModal.setup ) {
         return this.addExamModal.setup
       }
       return ''
@@ -222,7 +222,7 @@ export const ExamReceivedQuestion = Vue.component('exam-received-question', {
   methods: {
     ...mapMutations(['captureExamDetail', 'toggleIndividualCaptureTabRadio']),
     unsetDate(e) {
-      if (!e && this.modalSetup === 'individual') {
+      if ( !e && this.modalSetup === 'individual' ) {
         this.handleInput({
           target: {
             name: 'exam_received_date',
@@ -232,7 +232,7 @@ export const ExamReceivedQuestion = Vue.component('exam-received-question', {
       }
     },
     preSetDate() {
-      if (this.modalSetup === 'other' || this.modalSetup === 'pesticide') {
+      if ( this.modalSetup === 'other' || this.modalSetup === 'pesticide' ) {
         this.handleInput({
           target: {
             name: 'exam_received_date',
@@ -254,7 +254,7 @@ export const ExamReceivedQuestion = Vue.component('exam-received-question', {
     <b-row no-gutters>
       <b-col cols="6">
         <b-form-group v-if="showRadio">
-          <label>{{ q.text1 }}
+          <labe>{{ q.text1 }}
             <span v-if="error" style="color: red">{{ validationObj[q.key].message }}</span>
           </label><br>
           <b-form-radio-group v-model="showRadio"
@@ -273,6 +273,60 @@ export const ExamReceivedQuestion = Vue.component('exam-received-question', {
       <b-col cols="5" />
       <checkmark :validated="validationObj[q.key].valid" />
     </b-row>
+  `
+})
+
+export const AddExamCounter = Vue.component('add-exam-counter', {
+  props: ['error', 'q', 'validationObj', 'handleInput', 'exam'],
+  components: { checkmark },
+  computed: {
+    ...mapState({
+      setup: state => state.addExamModal.setup,
+      candidates: state => state.addExamModule.candidates,
+    }),
+    numberOfStudents() {
+      return this.exam.number_of_students
+    },
+    currentNumber() {
+      if (Array.isArray(this.candidates)) {
+        return this.candidates.length
+      }
+      return 0
+    },
+  },
+  watch: {
+    numberOfStudents(newVal) {
+      if ( newVal == this.currentNumber ) {
+        this.$store.commit('captureExamDetail', { key: 'add_exam_counter', value: 1 })
+      } else {
+        this.$store.commit('deleteCapturedExamDetail', 'add_exam_counter')
+      }
+    },
+    currentNumber(newVal) {
+      if (newVal == this.exam.number_of_students) {
+        this.$store.commit('captureExamDetail', {key: 'add_exam_counter', value: 1})
+      } else {
+        this.$store.commit('deleteCapturedExamDetail', 'add_exam_counter')
+      }
+    }
+  },
+  template: `
+    <fragment>
+      <b-row no-gutters class="mx-2">
+        <b-col cols="1">
+          <b-form-group>
+            <label class="m-0">Total</label>
+            <b-input class="my-0 w-50" disabled size="sm" :value="currentNumber" />
+          </b-form-group>
+        </b-col>
+        <checkmark :validated="validationObj[q.key].valid" />
+      </b-row>
+      <b-row no-gutters v-if="error && !validationObj['add_exam_counter'].valid">
+        <b-col cols="11" class="mt-1">
+          <span style="color: red">Number of selected exams does not equal the number of candidates</span>
+        </b-col>
+      </b-row>
+    </fragment>
   `
 })
 
@@ -362,31 +416,25 @@ export const InputQuestion2 = Vue.component('input-question-2', {
   template: `
     <fragment>
       <b-row no-gutters>
-        <b-col cols="5">
+        <b-col cols="3">
           <label>{{q.text}}
               <span v-if="error" style="color: red">{{ validationObj[q.key].message }}</span>
           </label>
         </b-col>
-        <b-col cols="6">
-          <label>Add Candidate Names Now?</label>
-        </b-col>
+        <b-col cols="9" />
       </b-row>
       <b-row no-gutters class="mb-1">
-        <b-col cols="5"><b-form-input :value="exam[q.key]"
+        <b-col cols="1"><b-form-input :value="exam[q.key]"
                           :name="q.key"
                           :key="q.key"
                           size="sm"
+                          class="w-50"
                           :id="q.key"
                           autocomplete="off"
                           @input.native="preHandleInput" />
         </b-col>
-        <b-col cols="6">
-          <b-form-select size="sm"
-                         style="height: 31px"
-                         :options="options"
-                         v-model="capture_names" />
-        </b-col>
-        <checkmark v-if="setup !=='challenger' " :validated="validationObj[q.key].valid"  />
+        
+        <checkmark :validated="validationObj[q.key].valid" />
       </b-row>
     </fragment>
   `

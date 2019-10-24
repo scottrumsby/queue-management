@@ -1,6 +1,12 @@
 <template>
   <b-form id="capture-ind-ita-form" autocomplete="off">
     <div v-for="q in questions" :key="q.key">
+      <AddExamCounter v-if="q.kind==='add_exam_counter'"
+                      :error="error"
+                      :q="q"
+                      :validationObj="validationObj"
+                      :handleInput="handleInput"
+                      :exam="exam" />
       <DropdownQuestion v-if="q.kind==='dropdown'"
                         :question="q"
                         :exam="exam"
@@ -41,18 +47,12 @@
                       :validationObj="validationObj"
                       :handleInput="handleInput"
                       :exam="exam" />
-      <GroupExamsInput v-if="q.kind==='group_exam_types'"
-                       :error="error"
-                       :q="q"
-                       :validationObj="validationObj"
-                       :handleInput="handleInput"
+      <GroupPesticideModal v-if="q.kind==='group_exam_types'"
+                           :error="error"
+                           :q="q"
+                           :validationObj="validationObj"
+                           :handleInput="handleInput"
                        :exam="exam" />
-      <GroupNamesInput v-if="q.kind==='group_name_input'"
-                      :error="error"
-                      :q="q"
-                      :validationObj="validationObj"
-                      :handleInput="handleInput"
-                      :exam="exam" />
       <!--see watcher in SelectQuestion of add-exam-form-components.js for GroupNamesInput default behaviour-->
       <SelectOffice v-if="q.kind==='office'"
                     v-show="is_liaison_designate || is_pesticide_designate"
@@ -96,6 +96,7 @@
 <script>
   import { mapState, mapMutations, mapGetters, mapActions } from 'vuex'
   import {
+    AddExamCounter,
     checkmark,
     DateQuestion,
     DropdownQuestion,
@@ -109,19 +110,17 @@
     SelectQuestion,
     TimeQuestion,
   } from './add-exam-form-components.js'
-  import GroupNamesInput from './form-components/group-names-input'
-  import GroupExamsInput from './form-components/group-exams-input'
-  import moment from 'moment'
+  import GroupPesticideModal from './form-components/group-pesticide-modal'
 
   export default {
     name: "AddExamFormController",
     components: {
+      AddExamCounter,
       checkmark,
       DateQuestion,
       DropdownQuestion,
       ExamReceivedQuestion,
-      GroupExamsInput,
-      GroupNamesInput,
+      GroupPesticideModal,
       InputQuestion,
       LocationInput,
       InputQuestion2,
@@ -313,6 +312,14 @@
           this.validate()
         })
       },
+      validationObj() {
+        //calling validate() with every change in validationObj() is untested with any workflow except 'pesticide',
+        //and other workflows don't seem to require this additional step, so limiting this call to fire only when
+        //setup === pesticide
+        if (this.addExamModal.setup === 'pesticide') {
+          this.validate()
+        }
+      }
     },
     methods: {
       ...mapMutations(['captureExamDetail', 'updateCaptureTab',]),

@@ -247,6 +247,12 @@ export const store = new Vuex.Store({
       if (state.showExamInventoryModal) {
         return state.exams.filter(exam => exam.booking_id === null)
       }
+      if (state.addExamModule.showAllPesticideExams) {
+        if (Array.isArray(state.addExamModule.allPesticideExams)) {
+          return state.addExamModule.allPesticideExams
+        }
+        return []
+      }
       return state.exams
     },
 
@@ -2545,6 +2551,13 @@ export const store = new Vuex.Store({
         state.capturedExam,
         payload.key,
         payload.value
+      )
+    },
+
+    deleteCapturedExamDetail(state, key) {
+      Vue.delete(
+        state.capturedExam,
+        key
       )
     },
 
